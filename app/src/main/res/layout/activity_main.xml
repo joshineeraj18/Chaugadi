@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/dark_green2"
+    tools:context="com.bhairaviwellbeing.chaugadi.MainActivity">
+
+    <LinearLayout
+        android:id="@+id/linlay1"
+        android:layout_width="wrap_content"
+        android:layout_height="80dp"
+        android:padding="2dp">
+
+        <ImageView
+            android:id="@+id/iv_card1"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/card_2c" />
+
+        <ImageView
+            android:id="@+id/iv_card2"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/card_2c" />
+
+        <ImageView
+            android:id="@+id/iv_card3"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/card_2c" />
+
+        <ImageView
+            android:id="@+id/iv_card4"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/card_2c" />
+
+        <ImageView
+            android:id="@+id/iv_card5"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/card_2c" />
+
+        <ImageView
+            android:id="@+id/iv_card6"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/card_2c" />
+
+        <ImageView
+            android:id="@+id/iv_card7"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/card_2c" />
+
+        <ImageView
+            android:id="@+id/iv_card8"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/card_2c" />
+
+    </LinearLayout>
+
+
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:id="@+id/rellay7"
+        android:layout_below="@+id/linlay1"
+        android:padding="2dp">
+
+        <ImageView
+            android:layout_width="50dp"
+            android:id="@+id/iv_card49"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:src ="@drawable/card_2c"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="143dp"
+            android:layout_alignParentStart="true" />
+
+        <ImageView
+            android:layout_width="50dp"
+            android:id="@+id/iv_card50"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:src ="@drawable/card_3c"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="168dp"
+            android:layout_alignParentStart="true" />
+
+        <ImageView
+            android:layout_width="50dp"
+            android:id="@+id/iv_card51"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="193dp"
+            android:src ="@drawable/card_qs"
+            android:layout_alignParentStart="true" />
+
+        <ImageView
+            android:id="@+id/iv_card52"
+            android:layout_width="390dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="0dp"
+            android:src="@drawable/card_4d"
+            android:layout_alignParentStart="true" />
+
+    </RelativeLayout>
+
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/rellay7"
+        android:id="@+id/btn_show"
+        android:text="SHOW"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20sp"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_show"
+        android:id="@+id/btn_shuffle"
+        android:text="SHUFFLE"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20sp"/>
+
+
+</RelativeLayout>
