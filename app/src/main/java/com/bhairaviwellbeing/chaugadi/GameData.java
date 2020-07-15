@@ -368,6 +368,23 @@ public class GameData {
         }
     }
 
+
+    public String getPlayerIDAtSeat(int seat){
+
+        switch (seat){
+            case 1:
+                return id1;
+            case 2:
+                return id2;
+            case 3:
+                return id3;
+            case 4:
+                return id4;
+            default:
+                return null;
+        }
+    }
+
     public int getClaim_seat() {
         return claim_seat;
     }

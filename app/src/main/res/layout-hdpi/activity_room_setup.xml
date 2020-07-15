@@ -18,6 +18,11 @@
         android:text="ROOM \nA101"
         android:textSize="28dp"
         android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:shadowColor="#000000"
+        android:shadowRadius="5"
+        android:shadowDx="0"
+        android:shadowDy="0"
         android:gravity="center_horizontal" />
 
     <TextView
@@ -32,7 +37,12 @@
         android:layout_marginRight="30dp"
         android:background="@drawable/background_green"
         android:layout_below="@+id/room_id_textview"
-        android:gravity="center_horizontal" />
+        android:gravity="center_horizontal"
+        android:textColor="#FFFFFF"
+        android:shadowColor="#000000"
+        android:shadowRadius="5"
+        android:shadowDx="0"
+        android:shadowDy="0"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -46,7 +56,12 @@
         android:layout_marginRight="30dp"
         android:background="@drawable/background_green"
         android:layout_below="@+id/player_1"
-        android:gravity="center_horizontal" />
+        android:gravity="center_horizontal"
+        android:textColor="#FFFFFF"
+        android:shadowColor="#000000"
+        android:shadowRadius="5"
+        android:shadowDx="0"
+        android:shadowDy="0"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -60,7 +75,12 @@
         android:layout_marginRight="30dp"
         android:background="@drawable/background_green"
         android:layout_below="@+id/player_2"
-        android:gravity="center_horizontal" />
+        android:gravity="center_horizontal"
+        android:textColor="#FFFFFF"
+        android:shadowColor="#000000"
+        android:shadowRadius="5"
+        android:shadowDx="0"
+        android:shadowDy="0"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -74,7 +94,12 @@
         android:layout_marginRight="30dp"
         android:background="@drawable/background_green"
         android:layout_below="@+id/player_3"
-        android:gravity="center_horizontal" />
+        android:gravity="center_horizontal"
+        android:textColor="#FFFFFF"
+        android:shadowColor="#000000"
+        android:shadowRadius="5"
+        android:shadowDx="0"
+        android:shadowDy="0"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -171,15 +196,39 @@
         </LinearLayout>
     </RelativeLayout>
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/add_pc"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:padding="10dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/button_background"
+        android:text="Add Computer"/>
+
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/btn_start"
-        android:layout_centerHorizontal="true"
+        android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
         android:layout_marginTop="14dp"
         android:layout_marginBottom="5dp"
+        android:layout_marginLeft="10dp"
         android:background="@drawable/button_background"
         android:text="START"/>
+
+    </LinearLayout>
 
 </RelativeLayout>

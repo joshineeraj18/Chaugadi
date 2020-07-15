@@ -29,12 +29,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class GameActivity extends AppCompatActivity implements View.OnClickListener{
+public class GameActivity extends AppCompatActivity implements View.OnClickListener {
 
 
-    LinearLayout cardRow1,cardRow2;
+    LinearLayout cardRow1, cardRow2;
     Button btn_Shuffle;
 
     FirebaseUser user;
@@ -61,11 +63,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     ImageView img_color;
     TextView tv_claim;
 
-    LinearLayout score_board,fee_score_board;
-    TextView scoreA,scoreB;
-    TextView fee_score_A,fee_score_B;
+    LinearLayout score_board, fee_score_board;
+    TextView scoreA, scoreB;
+    TextView fee_score_A, fee_score_B;
 
-    TextView u1,u2,u3;
+    TextView u1, u2, u3;
     Button start;
     Boolean latch = true;
 
@@ -85,7 +87,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     String sourceActivity;
     Boolean onResumet = false;
 
-    int sca,scb;
+    Computer pc1;
+    Map<String, Integer> claim_result_1 = new HashMap<String, Integer>();
+    Map<String, Integer> claim_result_2 = new HashMap<String, Integer>();
+    Map<String, Integer> claim_result_3 = new HashMap<String, Integer>();
+    Map<String, Integer> claim_result_4 = new HashMap<String, Integer>();
+
+
+    int sca, scb;
 
     ValueEventListener ve1;
 
@@ -97,28 +106,46 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onBackPressed() {
-      //  super.onBackPressed();
+        //  super.onBackPressed();
 
         new AlertDialog.Builder(this)
                 .setTitle("Exit Room!!!")
-                .setMessage("Do you want to Exit Room:"+room_no+"?")
+                .setMessage("Do you want to Exit Room:" + room_no + "?")
                 .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         reference2.removeEventListener(ve1);
                         reference.child("room").setValue("no-room");
-                        switch (gameData.getMyPosition(user.getUid())){
+
+                        if (gameData.getId2().contains("COMPUTER")) {
+                            gameData.setId2("empty");
+                        }
+                        if (gameData.getId3().contains("COMPUTER")) {
+                            gameData.setId3("empty");
+                        }
+                        if (gameData.getId4().contains("COMPUTER")) {
+                            gameData.setId4("empty");
+                        }
+
+
+                        reference2.setValue(gameData);
+
+                        switch (gameData.getMyPosition(user.getUid())) {
                             case 1:
                                 reference2.child("id1").setValue("empty");
+                                reference2.setValue(gameData);
                                 break;
                             case 2:
                                 reference2.child("id2").setValue("empty");
+                                reference2.setValue(gameData);
                                 break;
                             case 3:
                                 reference2.child("id3").setValue("empty");
+                                reference2.setValue(gameData);
                                 break;
                             case 4:
                                 reference2.child("id4").setValue("empty");
+                                reference2.setValue(gameData);
                                 break;
                         }
 
@@ -126,10 +153,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 gameData = dataSnapshot.getValue(GameData.class);
-                                if(gameData.getId1().equals("empty")
+
+                                if (gameData.getId1().equals("empty")
                                         && gameData.getId2().equals("empty")
                                         && gameData.getId3().equals("empty")
-                                        && gameData.getId4().equals("empty")){
+                                        && gameData.getId4().equals("empty")) {
                                     reference2.removeValue();
                                     DatabaseReference ref = FirebaseDatabase.getInstance().getReference("room_creation").child("Rooms_list");
                                     ref.child(room_no).removeValue();
@@ -143,7 +171,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                             }
                         });
 
-                        Intent intent1 = new Intent(GameActivity.this,TestActivity.class);
+                        Intent intent1 = new Intent(GameActivity.this, TestActivity.class);
                         startActivity(intent1);
                         finish();
 
@@ -171,45 +199,49 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         btn_Shuffle.setVisibility(View.GONE);
         im_deck_shuffle.setVisibility(View.GONE);
 
-        cardsound = MediaPlayer.create(GameActivity.this,R.raw.cardthrow1);
+        pc1 = new Computer();
+
+        cardsound = MediaPlayer.create(GameActivity.this, R.raw.cardthrow1);
 
         intent = getIntent();
         room_no = intent.getStringExtra("Room");
         sourceActivity = intent.getStringExtra("Activity");
 
-        if(sourceActivity.equals("TestActivity")){
+
+        if (sourceActivity.equals("TestActivity")) {
 
             reference2 = FirebaseDatabase.getInstance().getReference("Rooms").child(room_no);
+
             reference2.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     gameData = dataSnapshot.getValue(GameData.class);
 
-                    if(gameData.getState() == GameData.CLAIM){
+                    if (gameData.getState() == GameData.CLAIM) {
                         onResumet = true;
                     }
                     mySeatNo = gameData.getMyPosition(user.getUid());
 
-                    u1.setText(gameData.getPlayerAtSeat(gameData.getnextSeat(mySeatNo)).replaceAll("\\B","\n"));
+                    u1.setText(gameData.getPlayerAtSeat(gameData.getnextSeat(mySeatNo)).replaceAll("\\B", "\n"));
                     u2.setText(gameData.getPlayerAtSeat(gameData.getnextSeat(gameData.getnextSeat(mySeatNo))));
-                    u3.setText(gameData.getPlayerAtSeat(gameData.getnextSeat(gameData.getnextSeat(gameData.getnextSeat(mySeatNo)))).replaceAll("\\B","\n"));
+                    u3.setText(gameData.getPlayerAtSeat(gameData.getnextSeat(gameData.getnextSeat(gameData.getnextSeat(mySeatNo)))).replaceAll("\\B", "\n"));
 
-                    if(!(gameData.getState() == GameData.IDEAL || gameData.getState() == GameData.SHUFFLING)){
+                    if (!(gameData.getState() == GameData.IDEAL || gameData.getState() == GameData.SHUFFLING)) {
                         String str = gameData.getDeck();
-                        str = str.substring((mySeatNo-1)*26,(mySeatNo*26));
+                        str = str.substring((mySeatNo - 1) * 26, (mySeatNo * 26));
 
-                        for(int i = 0; i <= 12; i++){
+                        for (int i = 0; i <= 12; i++) {
 
                             myCards = new Card[13];
 
-                            if(!str.substring(0,2).equals("00")){
-                                myCards[i] = new Card(str.substring(0,2));
+                            if (!str.substring(0, 2).equals("00")) {
+                                myCards[i] = new Card(str.substring(0, 2));
                                 str = str.substring(2);
                                 cardsIV[i].setVisibility(View.VISIBLE);
                                 cardsIV[i].setImageResource(myCards[i].getRes());
                                 cardsIV[i].setClickable(false);
 
-                            }else {
+                            } else {
                                 str = str.substring(2);
                                 myCards[i] = new Card();
                                 cardsIV[i].setVisibility(View.INVISIBLE);
@@ -217,6 +249,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     }
                 }
+
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
 
@@ -230,41 +263,50 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         reference2 = FirebaseDatabase.getInstance().getReference("Rooms").child(room_no);
 
 
-
-
         ve1 = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 gameData = dataSnapshot.getValue(GameData.class);
                 mySeatNo = gameData.getMyPosition(user.getUid());
 
-                if(onResumet){
+                if (onResumet) {
                     gameData.setState(GameData.COLLECT_CARDS);
                 }
 
-                switch (gameData.getState()){
+                switch (gameData.getState()) {
                     case GameData.IDEAL:
 
-                        if(gameData.getChal_card_1() == 25 &&
+//                        if(gameData.getId2().equals("COMPUTER1")){
+//                            gameData.setChal_card_2(25);
+//                        }
+//                        if(gameData.getId3().equals("COMPUTER2")){
+//                            gameData.setChal_card_3(25);
+//                        }
+//                        if(gameData.getId4().equals("COMPUTER3")){
+//                            gameData.setChal_card_4(25);
+//                        }
+
+
+                        if (gameData.getChal_card_1() == 25 &&
                                 gameData.getChal_card_2() == 25 &&
                                 gameData.getChal_card_3() == 25 &&
-                                gameData.getChal_card_4() == 25 && mySeatNo == 1){
+                                gameData.getChal_card_4() == 25 && mySeatNo == 1) {
                             gameData.setState(GameData.SHUFFLING);
                             reference2.setValue(gameData);
-                        }else {
+                        } else {
                             message.setVisibility(View.VISIBLE);
                             message.setText("Please wait for all to join");
-                            if(gameData.getChal_card_1() == 25){
-                                message.append("\n"+gameData.getPlayerAtSeat(1)+" is in");
+                            if (gameData.getChal_card_1() == 25) {
+                                message.append("\n" + gameData.getPlayerAtSeat(1) + " is in");
                             }
-                            if(gameData.getChal_card_2() == 25){
-                                message.append("\n"+gameData.getPlayerAtSeat(2)+" is in");
+                            if (gameData.getChal_card_2() == 25) {
+                                message.append("\n" + gameData.getPlayerAtSeat(2) + " is in");
                             }
-                            if(gameData.getChal_card_3() == 25){
-                                message.append("\n"+gameData.getPlayerAtSeat(3)+" is in");
+                            if (gameData.getChal_card_3() == 25) {
+                                message.append("\n" + gameData.getPlayerAtSeat(3) + " is in");
                             }
-                            if(gameData.getChal_card_4() == 25){
-                                message.append("\n"+gameData.getPlayerAtSeat(4)+" is in");
+                            if (gameData.getChal_card_4() == 25) {
+                                message.append("\n" + gameData.getPlayerAtSeat(4) + " is in");
                             }
 
 
@@ -281,41 +323,41 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                         ll_color.setVisibility(View.INVISIBLE);
 
 
-                        if(gameData.getScoreA() > 0 ){
+                        if (gameData.getScoreA() > 0) {
                             sca = 0;
                             scb = Math.abs(gameData.getScoreA());
-                        }else {
+                        } else {
                             scb = 0;
                             sca = Math.abs(gameData.getScoreA());
                         }
 
-                        scoreA.setText(String.format("%2d",sca));
-                        scoreB.setText(String.format("%2d",scb));
+                        scoreA.setText(String.format("%2d", sca));
+                        scoreB.setText(String.format("%2d", scb));
 
-                        if(mySeatNo == 1 || mySeatNo == 3){
-                            myscore.setText(String.format("%2d",gameData.getFeesA()));
-                            oppscore.setText(String.format("%2d",gameData.getFeesB()));
-                        }else {
-                            myscore.setText(String.format("%2d",gameData.getFeesB()));
-                            oppscore.setText(String.format("%2d",gameData.getFeesA()));
+                        if (mySeatNo == 1 || mySeatNo == 3) {
+                            myscore.setText(String.format("%2d", gameData.getFeesA()));
+                            oppscore.setText(String.format("%2d", gameData.getFeesB()));
+                        } else {
+                            myscore.setText(String.format("%2d", gameData.getFeesB()));
+                            oppscore.setText(String.format("%2d", gameData.getFeesA()));
                         }
 
 
-                        if(mySeatNo == 1 || mySeatNo == 3){
-                            if(gameData.getScoreA() > 0){
+                        if (mySeatNo == 1 || mySeatNo == 3) {
+                            if (gameData.getScoreA() > 0) {
                                 point_side.setImageResource(R.drawable.ic_arrow_drop_up_black_24dp);
-                            }else {
+                            } else {
                                 point_side.setImageResource(R.drawable.ic_arrow_drop_down_black_24dp);
                             }
-                        }else {
-                            if(gameData.getScoreA() < 0){
+                        } else {
+                            if (gameData.getScoreA() < 0) {
                                 point_side.setImageResource(R.drawable.ic_arrow_drop_up_black_24dp);
-                            }else {
+                            } else {
                                 point_side.setImageResource(R.drawable.ic_arrow_drop_down_black_24dp);
                             }
                         }
 
-                        points.setText(String.format("%2d",Math.abs(gameData.getScoreA())));
+                        points.setText(String.format("%2d", Math.abs(gameData.getScoreA())));
 
 
                         thrown_cards[0].setVisibility(View.INVISIBLE);
@@ -326,42 +368,55 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                         gameData.setFeesA(0);
                         gameData.setFeesB(0);
 
-                        u1.setText(gameData.getPlayerAtSeat(gameData.getnextSeat(mySeatNo)).replaceAll("\\B","\n"));
+                        u1.setText(gameData.getPlayerAtSeat(gameData.getnextSeat(mySeatNo)).replaceAll("\\B", "\n"));
                         u2.setText(gameData.getPlayerAtSeat(gameData.getnextSeat(gameData.getnextSeat(mySeatNo))));
-                        u3.setText(gameData.getPlayerAtSeat(gameData.getnextSeat(gameData.getnextSeat(gameData.getnextSeat(mySeatNo)))).replaceAll("\\B","\n"));
+                        u3.setText(gameData.getPlayerAtSeat(gameData.getnextSeat(gameData.getnextSeat(gameData.getnextSeat(mySeatNo)))).replaceAll("\\B", "\n"));
 
-                        if(gameData.getShufflingSeat() == mySeatNo){
+
+                        if (gameData.getShufflingSeat() == mySeatNo) {
                             deck = new Deck();
                             btn_Shuffle.setText("Press to Shuffle");
                             btn_Shuffle.setVisibility(View.VISIBLE);
                             im_deck_shuffle.setVisibility(View.VISIBLE);
                             message.setText("Please Shuffle the Cards \nand Distribute");
-                        }else {
-                            message.setText(gameData.getPlayerAtSeat(gameData.getShufflingSeat())+" is shuffling the cards \nplease wait");
+                        } else {
+
+                            if (gameData.getPlayerIDAtSeat(gameData.getShufflingSeat()).contains("COMPUTER") && mySeatNo == 1) {
+                                deck = new Deck();
+                                deck.shuffle(100);
+                                gameData.setDeck(deck.toString());
+                                gameData.setState(GameData.COLLECT_CARDS);
+                                reference2.setValue(gameData);
+
+                            }
+                            message.setText(gameData.getPlayerAtSeat(gameData.getShufflingSeat()) + " is shuffling the cards \nplease wait");
                         }
                         break;
+
                     case GameData.COLLECT_CARDS:
                         deck = new Deck(gameData.getDeck());
-                        myCards = deck.getCards(((mySeatNo-1)*13),mySeatNo*13-1);
+                        myCards = deck.getCards(((mySeatNo - 1) * 13), mySeatNo * 13 - 1);
+
                         btn_Shuffle.setVisibility(View.INVISIBLE);
                         im_deck_shuffle.setVisibility(View.INVISIBLE);
-                        for (int i =0; i <= 12; i++){
-                            for (int j = 0; j < 12-i ;j++){
-                                if(myCards[j].getCardNo() < myCards[j+1].getCardNo()){
+                        for (int i = 0; i <= 12; i++) {
+                            for (int j = 0; j < 12 - i; j++) {
+                                if (myCards[j].getCardNo() < myCards[j + 1].getCardNo()) {
                                     Card tmp = myCards[j];
-                                    myCards[j]=myCards[j+1];
-                                    myCards[j+1]=tmp;
+                                    myCards[j] = myCards[j + 1];
+                                    myCards[j + 1] = tmp;
                                 }
                             }
                         }
 
                         message.setText("");
 
-                        for (int i = 0;i<=12;i++){
+                        for (int i = 0; i <= 12; i++) {
                             cardsIV[i].setVisibility(View.VISIBLE);
                             cardsIV[i].setImageResource(myCards[i].getRes());
                             cardsIV[i].setClickable(false);
                         }
+
                         if (mySeatNo == gameData.getShufflingSeat()) {
 
                             gameData.setClaim_seat(gameData.getnextSeat(gameData.getShufflingSeat()));
@@ -369,20 +424,28 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
                             gameData.setState(GameData.CLAIM);
                             reference2.setValue(gameData);
-                        }else if(onResumet){
+                        } else if (onResumet) {
                             onResumet = false;
                             gameData.setState(GameData.CLAIM);
                             gameData.setChal_card_1(0);
                             reference2.setValue(gameData);
                         }
+
+                        if (gameData.getPlayerIDAtSeat(gameData.getShufflingSeat()).contains("COMPUTER") && mySeatNo == 1) {
+                            gameData.setClaim_seat(gameData.getnextSeat(gameData.getShufflingSeat()));
+                            gameData.setClaim_number(1);
+                            gameData.setState(GameData.CLAIM);
+                            reference2.setValue(gameData);
+                        }
                         break;
-                    case GameData.CLAIM:
-                        switch (gameData.getClaim_number()){
+
+                    case GameData.CLAIM: {
+                        switch (gameData.getClaim_number()) {
                             case 1:
-                                if(gameData.getClaim_seat() == mySeatNo){
+                                if (gameData.getClaim_seat() == mySeatNo) {
                                     message.setText("Its your term to claim\nPlease claim");
                                     {
-                                        LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+                                        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
                                         final View popupView = inflater.inflate(R.layout.popup_window, null);
                                         DisplayMetrics dm = new DisplayMetrics();
                                         getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -390,7 +453,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                         final int height = dm.heightPixels;
 
                                         boolean focusable = true;
-                                        popupWindow = new PopupWindow(popupView, (int)(width*0.46), (int)(height*0.3), focusable);
+                                        popupWindow = new PopupWindow(popupView, (int) (width * 0.46), (int) (height * 0.3), focusable);
 
                                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                             popupWindow.setElevation(20);
@@ -407,8 +470,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                         popupWindow.setTouchInterceptor(new View.OnTouchListener() {
                                             @Override
                                             public boolean onTouch(View v, MotionEvent motionEvent) {
-                                                if (motionEvent.getX() < 0 || motionEvent.getX() > (int)(width*0.46)) return true;
-                                                if (motionEvent.getY() < 0 || motionEvent.getY() > (int)(height*0.3)) return true;
+                                                if (motionEvent.getX() < 0 || motionEvent.getX() > (int) (width * 0.46))
+                                                    return true;
+                                                if (motionEvent.getY() < 0 || motionEvent.getY() > (int) (height * 0.3))
+                                                    return true;
                                                 return false;
                                             }
                                         });
@@ -424,51 +489,73 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                         keypad[6] = popupView.findViewById(R.id.btn_pass);
 
 
-                                                String temp = new String();
-                                                for(int i=0; i <= 12; i++){
-                                                    temp = myCards[i].toString() + temp;
-                                                }
-                                                String tmp2 = new String();
-                                                switch (mySeatNo){
-                                                    case 1:
-                                                        tmp2 = temp + gameData.getDeck().substring(26);
-                                                        gameData.setDeck(tmp2);
-                                                        break;
-                                                    case 2:
-                                                        tmp2 = gameData.getDeck().substring(0,26) + temp +gameData.getDeck().substring(52);
-                                                        gameData.setDeck(tmp2);
-                                                        break;
-                                                    case 3:
-                                                        tmp2 = gameData.getDeck().substring(0,52) + temp +gameData.getDeck().substring(78);
-                                                        gameData.setDeck(tmp2);
-                                                        break;
-                                                    case 4:
-                                                        tmp2 = gameData.getDeck().substring(0,78) + temp;
-                                                        gameData.setDeck(tmp2);
-                                                        break;
-                                                }
+                                        String temp = new String();
+                                        for (int i = 0; i <= 12; i++) {
+                                            temp = myCards[i].toString() + temp;
+                                        }
+                                        String tmp2 = new String();
+                                        switch (mySeatNo) {
+                                            case 1:
+                                                tmp2 = temp + gameData.getDeck().substring(26);
+                                                gameData.setDeck(tmp2);
+                                                break;
+                                            case 2:
+                                                tmp2 = gameData.getDeck().substring(0, 26) + temp + gameData.getDeck().substring(52);
+                                                gameData.setDeck(tmp2);
+                                                break;
+                                            case 3:
+                                                tmp2 = gameData.getDeck().substring(0, 52) + temp + gameData.getDeck().substring(78);
+                                                gameData.setDeck(tmp2);
+                                                break;
+                                            case 4:
+                                                tmp2 = gameData.getDeck().substring(0, 78) + temp;
+                                                gameData.setDeck(tmp2);
+                                                break;
+                                        }
 
-                                                for(int i=0; i<= 6 ;i++){
-                                                    keypad[i].setOnClickListener(GameActivity.this);
-                                                }
+                                        for (int i = 0; i <= 6; i++) {
+                                            keypad[i].setOnClickListener(GameActivity.this);
+                                        }
 
 
                                     }    //Setting up Popup Window
-                                }else {
-                                    message.setText("Please wait "+gameData.getPlayerAtSeat(gameData.getClaim_seat())+" is Claiming");
+                                } else {
+
+
+                                    message.setText("Please wait " + gameData.getPlayerAtSeat(gameData.getClaim_seat()) + " is Claiming");
+
+                                    if (gameData.getPlayerIDAtSeat(gameData.getClaim_seat()).contains("COMPUTER") && mySeatNo == 1) {
+
+                                        claim_result_1 = pc1.surProcess(0, 0, 0, gameData.getClaim_seat(), gameData.getDeck());
+
+
+                                        gameData.setNextClaimNumber((claim_result_1.get("Sur") < 7) ? 7 : claim_result_1.get("Sur"));
+                                        gameData.setNextClaimData();
+                                        //reference2.setValue(gameData);
+
+
+                                        final Handler handler = new Handler();
+                                        handler.postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                // Do something after 5s = 5000ms
+                                                reference2.setValue(gameData);
+                                            }
+                                        }, 3000);
+                                    }
                                 }
                                 break;
                             case 2:
-                                if(gameData.getClaim_seat() == mySeatNo){
+                                if (gameData.getClaim_seat() == mySeatNo) {
 
                                     if (gameData.getChal_card_1() == 7) {
-                                        message.setText(gameData.getPlayerAtSeat(gameData.getPrvSeat(gameData.getClaim_seat()))+" Said: Pass\nIts your term to claim\nPlease claim");
-                                    }else {
-                                        message.setText(gameData.getPlayerAtSeat(gameData.getPrvSeat(gameData.getClaim_seat()))+" Claims:"+gameData.getChal_card_1()+"\nIts your term to claim\nPlease claim");
+                                        message.setText(gameData.getPlayerAtSeat(gameData.getPrvSeat(gameData.getClaim_seat())) + " Said: Pass\nIts your term to claim\nPlease claim");
+                                    } else {
+                                        message.setText(gameData.getPlayerAtSeat(gameData.getPrvSeat(gameData.getClaim_seat())) + " Claims:" + gameData.getChal_card_1() + "\nIts your term to claim\nPlease claim");
                                     }
 
                                     {
-                                        LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+                                        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
                                         final View popupView = inflater.inflate(R.layout.popup_window, null);
 
                                         DisplayMetrics dm = new DisplayMetrics();
@@ -477,7 +564,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                         final int height = dm.heightPixels;
 
                                         boolean focusable = true;
-                                        popupWindow = new PopupWindow(popupView, (int)(width*0.46), (int)(height*0.3), focusable);
+                                        popupWindow = new PopupWindow(popupView, (int) (width * 0.46), (int) (height * 0.3), focusable);
 
                                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                             popupWindow.setElevation(20);
@@ -494,8 +581,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                         popupWindow.setTouchInterceptor(new View.OnTouchListener() {
                                             @Override
                                             public boolean onTouch(View v, MotionEvent motionEvent) {
-                                                if (motionEvent.getX() < 0 || motionEvent.getX() > (int)(width*0.46)) return true;
-                                                if (motionEvent.getY() < 0 || motionEvent.getY() > (int)(height*0.3)) return true;
+                                                if (motionEvent.getX() < 0 || motionEvent.getX() > (int) (width * 0.46))
+                                                    return true;
+                                                if (motionEvent.getY() < 0 || motionEvent.getY() > (int) (height * 0.3))
+                                                    return true;
                                                 return false;
                                             }
                                         });
@@ -511,35 +600,54 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                         keypad[6] = popupView.findViewById(R.id.btn_pass);
 
                                         int i;
-                                        if(gameData.getChal_card_1() == 7){
+                                        if (gameData.getChal_card_1() == 7) {
                                             i = 0;
-                                        }else {
+                                        } else {
                                             i = gameData.getChal_card_1() - 7;
                                         }
-                                        for(; i<= 6 ;i++){
+                                        for (; i <= 6; i++) {
                                             keypad[i].setOnClickListener(GameActivity.this);
                                         }
                                     }    //Setting up Popup Window
-                                }else {
+                                } else {
                                     if (gameData.getChal_card_1() == 7) {
-                                        message.setText(gameData.getPlayerAtSeat(gameData.getPrvSeat(gameData.getClaim_seat()))+" Said: Pass");
+                                        message.setText(gameData.getPlayerAtSeat(gameData.getPrvSeat(gameData.getClaim_seat())) + " Said: Pass");
                                     } else {
-                                        message.setText(gameData.getPlayerAtSeat(gameData.getPrvSeat(gameData.getClaim_seat()))+" Claims:"+gameData.getChal_card_1()+"\n"+
-                                                gameData.getPlayerAtSeat(gameData.getClaim_seat()) +" is claiming");
+                                        message.setText(gameData.getPlayerAtSeat(gameData.getPrvSeat(gameData.getClaim_seat())) + " Claims:" + gameData.getChal_card_1() + "\n" +
+                                                gameData.getPlayerAtSeat(gameData.getClaim_seat()) + " is claiming");
+                                    }
+
+                                    if (gameData.getPlayerIDAtSeat(gameData.getClaim_seat()).contains("COMPUTER") && mySeatNo == 1) {
+
+                                        claim_result_2 = pc1.surProcess(gameData.getChal_card_1(), 0, 0, gameData.getClaim_seat(), gameData.getDeck());
+
+                                        gameData.setNextClaimNumber((int) claim_result_2.get("Sur"));
+                                        gameData.setNextClaimData();
+                                        //reference2.setValue(gameData);
+
+
+                                        final Handler handler = new Handler();
+                                        handler.postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                // Do something after 5s = 5000ms
+                                                reference2.setValue(gameData);
+                                            }
+                                        }, 3000);
                                     }
                                 }
                                 break;
                             case 3:
-                                if(gameData.getClaim_seat() == mySeatNo){
+                                if (gameData.getClaim_seat() == mySeatNo) {
 
                                     if (gameData.getChal_card_2() == 0) {
-                                        message.setText(gameData.getPlayerAtSeat(gameData.getPrvSeat(gameData.getClaim_seat()))+" Said: Pass\nIts your term to claim\nPlease claim");
-                                    }else {
-                                        message.setText(gameData.getPlayerAtSeat(gameData.getPrvSeat(gameData.getClaim_seat()))+" Claims:"+gameData.getChal_card_2()+"\nIts your term to claim\nPlease claim");
+                                        message.setText(gameData.getPlayerAtSeat(gameData.getPrvSeat(gameData.getClaim_seat())) + " Said: Pass\nIts your term to claim\nPlease claim");
+                                    } else {
+                                        message.setText(gameData.getPlayerAtSeat(gameData.getPrvSeat(gameData.getClaim_seat())) + " Claims:" + gameData.getChal_card_2() + "\nIts your term to claim\nPlease claim");
                                     }
 
                                     {
-                                        LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+                                        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
                                         final View popupView = inflater.inflate(R.layout.popup_window, null);
                                         DisplayMetrics dm = new DisplayMetrics();
                                         getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -547,7 +655,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                         final int height = dm.heightPixels;
 
                                         boolean focusable = true;
-                                        popupWindow = new PopupWindow(popupView, (int)(width*0.46), (int)(height*0.3), focusable);
+                                        popupWindow = new PopupWindow(popupView, (int) (width * 0.46), (int) (height * 0.3), focusable);
 
                                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                             popupWindow.setElevation(20);
@@ -564,8 +672,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                         popupWindow.setTouchInterceptor(new View.OnTouchListener() {
                                             @Override
                                             public boolean onTouch(View v, MotionEvent motionEvent) {
-                                                if (motionEvent.getX() < 0 || motionEvent.getX() > (int)(width*0.46)) return true;
-                                                if (motionEvent.getY() < 0 || motionEvent.getY() > (int)(height*0.3)) return true;
+                                                if (motionEvent.getX() < 0 || motionEvent.getX() > (int) (width * 0.46))
+                                                    return true;
+                                                if (motionEvent.getY() < 0 || motionEvent.getY() > (int) (height * 0.3))
+                                                    return true;
                                                 return false;
                                             }
                                         });
@@ -580,35 +690,54 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                         keypad[5] = popupView.findViewById(R.id.btn_13);
                                         keypad[6] = popupView.findViewById(R.id.btn_pass);
                                         int i;
-                                        if(gameData.getChal_card_2() == 0){
+                                        if (gameData.getChal_card_2() == 0) {
                                             i = gameData.getChal_card_1() - 7;
-                                        }else {
+                                        } else {
                                             i = gameData.getChal_card_2() - 7;
                                         }
-                                        for(; i<= 6 ;i++){
+                                        for (; i <= 6; i++) {
                                             keypad[i].setOnClickListener(GameActivity.this);
                                         }
                                     }    //Setting up Popup Window
-                                }else {
+                                } else {
                                     if (gameData.getChal_card_2() == 0) {
-                                        message.setText(gameData.getPlayerAtSeat(gameData.getPrvSeat(gameData.getClaim_seat()))+" Said: Pass");
+                                        message.setText(gameData.getPlayerAtSeat(gameData.getPrvSeat(gameData.getClaim_seat())) + " Said: Pass");
                                     } else {
-                                        message.setText(gameData.getPlayerAtSeat(gameData.getPrvSeat(gameData.getClaim_seat()))+" Claims:"+gameData.getChal_card_2()+"\n"+
-                                                gameData.getPlayerAtSeat(gameData.getClaim_seat()) +" is claiming");
+                                        message.setText(gameData.getPlayerAtSeat(gameData.getPrvSeat(gameData.getClaim_seat())) + " Claims:" + gameData.getChal_card_2() + "\n" +
+                                                gameData.getPlayerAtSeat(gameData.getClaim_seat()) + " is claiming");
+                                    }
+
+                                    if (gameData.getPlayerIDAtSeat(gameData.getClaim_seat()).contains("COMPUTER") && mySeatNo == 1) {
+
+                                        claim_result_3 = pc1.surProcess(gameData.getChal_card_2(), gameData.getChal_card_1(), 0, gameData.getClaim_seat(), gameData.getDeck());
+
+                                        gameData.setNextClaimNumber((int) claim_result_3.get("Sur"));
+                                        gameData.setNextClaimData();
+                                        //reference2.setValue(gameData);
+
+
+                                        final Handler handler = new Handler();
+                                        handler.postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                // Do something after 5s = 5000ms
+                                                reference2.setValue(gameData);
+                                            }
+                                        }, 3000);
                                     }
                                 }
                                 break;
                             case 4:
-                                if(gameData.getClaim_seat() == mySeatNo){
+                                if (gameData.getClaim_seat() == mySeatNo) {
 
                                     if (gameData.getChal_card_3() == 0) {
-                                        message.setText(gameData.getPlayerAtSeat(gameData.getPrvSeat(gameData.getClaim_seat()))+" Said: Pass\nIts your term to claim\nPlease claim");
-                                    }else {
-                                        message.setText(gameData.getPlayerAtSeat(gameData.getPrvSeat(gameData.getClaim_seat()))+" Claims:"+gameData.getChal_card_3()+"\nIts your term to claim\nPlease claim");
+                                        message.setText(gameData.getPlayerAtSeat(gameData.getPrvSeat(gameData.getClaim_seat())) + " Said: Pass\nIts your term to claim\nPlease claim");
+                                    } else {
+                                        message.setText(gameData.getPlayerAtSeat(gameData.getPrvSeat(gameData.getClaim_seat())) + " Claims:" + gameData.getChal_card_3() + "\nIts your term to claim\nPlease claim");
                                     }
 
                                     {
-                                        LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+                                        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
                                         final View popupView = inflater.inflate(R.layout.popup_window, null);
                                         DisplayMetrics dm = new DisplayMetrics();
                                         getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -616,7 +745,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                         final int height = dm.heightPixels;
 
                                         boolean focusable = true;
-                                        popupWindow = new PopupWindow(popupView, (int)(width*0.46), (int)(height*0.3), focusable);
+                                        popupWindow = new PopupWindow(popupView, (int) (width * 0.46), (int) (height * 0.3), focusable);
 
                                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                             popupWindow.setElevation(20);
@@ -633,8 +762,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                         popupWindow.setTouchInterceptor(new View.OnTouchListener() {
                                             @Override
                                             public boolean onTouch(View v, MotionEvent motionEvent) {
-                                                if (motionEvent.getX() < 0 || motionEvent.getX() > (int)(width*0.46)) return true;
-                                                if (motionEvent.getY() < 0 || motionEvent.getY() > (int)(height*0.3)) return true;
+                                                if (motionEvent.getX() < 0 || motionEvent.getX() > (int) (width * 0.46))
+                                                    return true;
+                                                if (motionEvent.getY() < 0 || motionEvent.getY() > (int) (height * 0.3))
+                                                    return true;
                                                 return false;
                                             }
                                         });
@@ -651,37 +782,56 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
                                         int i;
                                         gameData.setState(GameData.CLAIM_COLOR);
-                                        if(gameData.getChal_card_3() == 0){
-                                            if(gameData.getChal_card_2() == 0){
+                                        if (gameData.getChal_card_3() == 0) {
+                                            if (gameData.getChal_card_2() == 0) {
                                                 i = gameData.getChal_card_1() - 7;
-                                            }else {
+                                            } else {
                                                 i = gameData.getChal_card_2() - 7;
                                             }
-                                        }else {
+                                        } else {
                                             i = gameData.getChal_card_3() - 7;
                                         }
 
-                                        for(; i<= 6 ;i++){
+                                        for (; i <= 6; i++) {
                                             keypad[i].setOnClickListener(GameActivity.this);
                                         }
                                     }    //Setting up Popup Window
-                                }else {
+                                } else {
                                     if (gameData.getChal_card_3() == 0) {
-                                        message.setText(gameData.getPlayerAtSeat(gameData.getPrvSeat(gameData.getClaim_seat()))+" Said: Pass");
+                                        message.setText(gameData.getPlayerAtSeat(gameData.getPrvSeat(gameData.getClaim_seat())) + " Said: Pass");
                                     } else {
-                                        message.setText(gameData.getPlayerAtSeat(gameData.getPrvSeat(gameData.getClaim_seat()))+" Claims:"+gameData.getChal_card_3()+"\n"+
-                                                gameData.getPlayerAtSeat(gameData.getClaim_seat()) +" is claiming");
+                                        message.setText(gameData.getPlayerAtSeat(gameData.getPrvSeat(gameData.getClaim_seat())) + " Claims:" + gameData.getChal_card_3() + "\n" +
+                                                gameData.getPlayerAtSeat(gameData.getClaim_seat()) + " is claiming");
+                                    }
+
+                                    if (gameData.getPlayerIDAtSeat(gameData.getClaim_seat()).contains("COMPUTER") && mySeatNo == 1) {
+
+                                        claim_result_4 = pc1.surProcess(gameData.getChal_card_3(), gameData.getChal_card_2(), gameData.getChal_card_1(), gameData.getClaim_seat(), gameData.getDeck());
+
+                                        gameData.setNextClaimNumber((int) claim_result_4.get("Sur"));
+                                        gameData.setNextClaimData();
+                                        //reference2.setValue(gameData);
+                                        gameData.setState(GameData.CLAIM_COLOR);
+
+                                        final Handler handler = new Handler();
+                                        handler.postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                // Do something after 5s = 5000ms
+                                                reference2.setValue(gameData);
+                                            }
+                                        }, 3000);
                                     }
                                 }
                                 break;
                         }
                         break;
-                    case GameData.CLAIM_COLOR:
-
-                        if(gameData.getClaim_seat() == mySeatNo){
+                    }
+                    case GameData.CLAIM_COLOR: {
+                        if (gameData.getClaim_seat() == mySeatNo) {
 
                             message.setText("Please Select the Color");
-                            LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+                            LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
                             final View popupView2 = inflater.inflate(R.layout.popup_color, null);
 
                             DisplayMetrics dm = new DisplayMetrics();
@@ -690,7 +840,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                             final int width = dm.widthPixels;
                             final int height = dm.heightPixels;
                             boolean focusable = true;
-                            popupWindow = new PopupWindow(popupView2, (int)(width*0.56),(int) (height*0.3), focusable);
+                            popupWindow = new PopupWindow(popupView2, (int) (width * 0.56), (int) (height * 0.3), focusable);
 
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                 popupWindow.setElevation(20);
@@ -706,8 +856,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                             popupWindow.setTouchInterceptor(new View.OnTouchListener() {
                                 @Override
                                 public boolean onTouch(View v, MotionEvent motionEvent) {
-                                    if (motionEvent.getX() < 0 || motionEvent.getX() > (int)(width*0.46)) return true;
-                                    if (motionEvent.getY() < 0 || motionEvent.getY() > (int)(height*0.3)) return true;
+                                    if (motionEvent.getX() < 0 || motionEvent.getX() > (int) (width * 0.46))
+                                        return true;
+                                    if (motionEvent.getY() < 0 || motionEvent.getY() > (int) (height * 0.3))
+                                        return true;
                                     return false;
                                 }
                             });
@@ -718,28 +870,86 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                             keypad[2] = popupView2.findViewById(R.id.btn_diamond);
                             keypad[3] = popupView2.findViewById(R.id.btn_heart);
 
-                            for(int i=0; i<= 3 ;i++){
+                            for (int i = 0; i <= 3; i++) {
                                 keypad[i].setOnClickListener(GameActivity.this);
                             }
 
 
-                        }else {
+                        } else {
                             if (gameData.getChal_card_4() == 0) {
-                                message.setText(gameData.getPlayerAtSeat(gameData.getShufflingSeat())+" Said: Pass");
+                                message.setText(gameData.getPlayerAtSeat(gameData.getShufflingSeat()) + " Said: Pass");
                             } else {
-                                message.setText(gameData.getPlayerAtSeat(gameData.getShufflingSeat())+" Claims:"+gameData.getChal_card_4());
+                                message.setText(gameData.getPlayerAtSeat(gameData.getShufflingSeat()) + " Claims:" + gameData.getChal_card_4());
                             }
-                            message.append("\nPlease Wait "+gameData.getPlayerAtSeat(gameData.getClaim_seat())+" is selecting color");
+                            message.append("\nPlease Wait " + gameData.getPlayerAtSeat(gameData.getClaim_seat()) + " is selecting color");
+
+
+                            if (gameData.getPlayerIDAtSeat(gameData.getClaim_seat()).contains("COMPUTER") && mySeatNo == 1) {
+
+                                int index;
+
+                                if (gameData.getClaim_number() == gameData.getChal_card_1()) {
+                                    index = 0;
+                                    gameData.setClaim_color(claim_result_1.get("Suit"));
+                                    gameData.setChalof(gameData.getClaim_seat(), 25);
+                                    gameData.setState(GameData.CLAIM_READY);
+                                } else if (gameData.getClaim_number() == gameData.getChal_card_2()) {
+                                    index = 1;
+                                    gameData.setClaim_color(claim_result_2.get("Suit"));
+                                    gameData.setChalof(gameData.getClaim_seat(), 25);
+                                    gameData.setState(GameData.CLAIM_READY);
+
+                                } else if (gameData.getClaim_number() == gameData.getChal_card_3()) {
+                                    index = 2;
+                                    gameData.setClaim_color(claim_result_3.get("Suit"));
+                                    gameData.setChalof(gameData.getClaim_seat(), 25);
+                                    gameData.setState(GameData.CLAIM_READY);
+
+                                } else {
+                                    index = 3;
+                                    gameData.setClaim_color(claim_result_4.get("Suit"));
+                                    gameData.setChalof(gameData.getClaim_seat(), 25);
+                                    gameData.setState(GameData.CLAIM_READY);
+                                }
+
+
+                                if (gameData.getId1().contains("COMPUTER")) {
+                                    gameData.setChal_card_1(25);
+                                }
+                                if (gameData.getId2().contains("COMPUTER")) {
+                                    gameData.setChal_card_2(25);
+                                }
+                                if (gameData.getId3().contains("COMPUTER")) {
+                                    gameData.setChal_card_3(25);
+                                }
+                                if (gameData.getId4().contains("COMPUTER")) {
+                                    gameData.setChal_card_4(25);
+                                }
+
+                                //reference2.setValue(gameData);
+
+
+                                final Handler handler = new Handler();
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        // Do something after 5s = 5000ms
+                                        reference2.setValue(gameData);
+                                    }
+                                }, 3000);
+                            }
                         }
 
                         break;
-                    case  GameData.CLAIM_READY:
-                        if(gameData.getClaim_seat() == mySeatNo){
-                            if(gameData.getChalof(1) == 25 &&
+                    }
+                    case GameData.CLAIM_READY:
+
+                        if (gameData.getClaim_seat() == mySeatNo) {
+                            if (gameData.getChalof(1) == 25 &&
                                     gameData.getChalof(2) == 25 &&
                                     gameData.getChalof(3) == 25 &&
-                                    gameData.getChalof(4) == 25){
-                                LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+                                    gameData.getChalof(4) == 25) {
+                                LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
                                 final View popupView3 = inflater.inflate(R.layout.popup_claim_ready, null);
 
                                 DisplayMetrics dm = new DisplayMetrics();
@@ -748,7 +958,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                 int width = dm.widthPixels;
                                 int height = dm.heightPixels;
                                 boolean focusable = true;
-                                popupWindow2 = new PopupWindow(popupView3,(int) (width*0.46),(int) (height*0.3), focusable);
+                                popupWindow2 = new PopupWindow(popupView3, (int) (width * 0.46), (int) (height * 0.3), focusable);
 
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                     popupWindow2.setElevation(20);
@@ -759,7 +969,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                 TextView tv_claim_num = popupView3.findViewById(R.id.text_claim_num);
 
                                 tv_claim_player.setText(gameData.getPlayerAtSeat(gameData.getClaim_seat()));
-                                switch (gameData.getClaim_color()){
+                                switch (gameData.getClaim_color()) {
                                     case 1:
                                         iv_claim.setImageResource(R.drawable.nw_01);
                                         img_color.setImageResource(R.drawable.nw_01);
@@ -777,8 +987,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                         img_color.setImageResource(R.drawable.nw_02);
                                         break;
                                 }
-                                tv_claim_num.setText(String.format("%02d",gameData.getClaim_number()));
-                                claim_u1.setText(String.format("%02d",gameData.getClaim_number()));
+                                tv_claim_num.setText(String.format("%02d", gameData.getClaim_number()));
+                                claim_u1.setText(String.format("%02d", gameData.getClaim_number()));
                                 claim_u1.setVisibility(View.VISIBLE);
 //                                tv_claim.setText(String.format("%02d",gameData.getClaim_number()));
 
@@ -794,14 +1004,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                 Button start = popupView3.findViewById(R.id.btn_start);
                                 start.setOnClickListener(GameActivity.this);
 
-                            }else {
+                            } else {
                                 message.setText("Please Wait for all players to get ready");
                             }
-                        }else {
+                        } else {
                             if (gameData.getChalof(mySeatNo) != 25) {
                                 if (latch) {
                                     latch = false;
-                                    LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+                                    LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
                                     final View popupView3 = inflater.inflate(R.layout.popup_claim_ready, null);
                                     DisplayMetrics dm = new DisplayMetrics();
                                     getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -809,7 +1019,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                     final int width = dm.widthPixels;
                                     final int height = dm.heightPixels;
                                     boolean focusable = true;
-                                    popupWindow2 = new PopupWindow(popupView3, (int)(width*0.46),(int) (height*0.3), focusable);
+                                    popupWindow2 = new PopupWindow(popupView3, (int) (width * 0.46), (int) (height * 0.3), focusable);
 
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                         popupWindow2.setElevation(20);
@@ -820,7 +1030,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                     TextView tv_claim_num = popupView3.findViewById(R.id.text_claim_num);
 
                                     tv_claim_player.setText(gameData.getPlayerAtSeat(gameData.getClaim_seat()));
-                                    switch (gameData.getClaim_color()){
+                                    switch (gameData.getClaim_color()) {
                                         case 1:
                                             iv_claim.setImageResource(R.drawable.nw_01);
                                             img_color.setImageResource(R.drawable.nw_01);
@@ -838,27 +1048,27 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                             img_color.setImageResource(R.drawable.nw_02);
                                             break;
                                     }
-                                    tv_claim_num.setText(String.format("%02d",gameData.getClaim_number()));
+                                    tv_claim_num.setText(String.format("%02d", gameData.getClaim_number()));
 
                                     int tmpSeat = gameData.getClaim_seat() - mySeatNo;
-                                    if(tmpSeat<0){
+                                    if (tmpSeat < 0) {
                                         tmpSeat = 4 + tmpSeat;
                                     }
-                                    switch (tmpSeat){
+                                    switch (tmpSeat) {
                                         case 0:
-                                            claim_u1.setText(String.format("%02d",gameData.getClaim_number()));
+                                            claim_u1.setText(String.format("%02d", gameData.getClaim_number()));
                                             claim_u1.setVisibility(View.VISIBLE);
                                             break;
                                         case 1:
-                                            claim_u2.setText(String.format("%02d",gameData.getClaim_number()));
+                                            claim_u2.setText(String.format("%02d", gameData.getClaim_number()));
                                             claim_u2.setVisibility(View.VISIBLE);
                                             break;
                                         case 2:
-                                            claim_u3.setText(String.format("%02d",gameData.getClaim_number()));
+                                            claim_u3.setText(String.format("%02d", gameData.getClaim_number()));
                                             claim_u3.setVisibility(View.VISIBLE);
                                             break;
                                         case 3:
-                                            claim_u4.setText(String.format("%02d",gameData.getClaim_number()));
+                                            claim_u4.setText(String.format("%02d", gameData.getClaim_number()));
                                             claim_u4.setVisibility(View.VISIBLE);
                                             break;
 
@@ -875,8 +1085,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                     popupWindow2.setTouchInterceptor(new View.OnTouchListener() {
                                         @Override
                                         public boolean onTouch(View v, MotionEvent motionEvent) {
-                                            if (motionEvent.getX() < 0 || motionEvent.getX() > (int)(width*0.46)) return true;
-                                            if (motionEvent.getY() < 0 || motionEvent.getY() > (int)(height*0.3)) return true;
+                                            if (motionEvent.getX() < 0 || motionEvent.getX() > (int) (width * 0.46))
+                                                return true;
+                                            if (motionEvent.getY() < 0 || motionEvent.getY() > (int) (height * 0.3))
+                                                return true;
                                             return false;
                                         }
                                     });
@@ -885,8 +1097,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                     start = popupView3.findViewById(R.id.btn_start);
                                     start.setOnClickListener(GameActivity.this);
                                 }
-                            }else {
+                            } else {
                                 message.setText("Please wait for all players to get ready");
+                                if (gameData.getPlayerIDAtSeat(gameData.getClaim_seat()).contains("COMPUTER") && mySeatNo == 1) {
+                                    gameData.setChal_seat(gameData.getClaim_seat());
+                                    gameData.setState(GameData.CHAL_1);
+                                    reference2.setValue(gameData);
+
+                                }
                             }
 
                         }
@@ -899,150 +1117,217 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                         thrown_cards[2].setVisibility(View.INVISIBLE);
                         thrown_cards[3].setVisibility(View.INVISIBLE);
 
-                        if(gameData.getChal_seat() == mySeatNo){
+                        if (gameData.getChal_seat() == mySeatNo) {
 //                            fee_score_board.setVisibility(View.VISIBLE);
-                            if(mySeatNo == 1 || mySeatNo == 3){
-                                myscore.setText(String.format("%2d",gameData.getFeesA()));
-                                oppscore.setText(String.format("%2d",gameData.getFeesB()));
-                            }else {
-                                myscore.setText(String.format("%2d",gameData.getFeesB()));
-                                oppscore.setText(String.format("%2d",gameData.getFeesA()));
+                            if (mySeatNo == 1 || mySeatNo == 3) {
+                                myscore.setText(String.format("%2d", gameData.getFeesA()));
+                                oppscore.setText(String.format("%2d", gameData.getFeesB()));
+                            } else {
+                                myscore.setText(String.format("%2d", gameData.getFeesB()));
+                                oppscore.setText(String.format("%2d", gameData.getFeesA()));
                             }
 //                            fee_score_A.setText(String.format("%2d",gameData.getFeesA()));
 //                            fee_score_B.setText(String.format("%2d",gameData.getFeesB()));
 
 //                            score_board.setVisibility(View.VISIBLE);
-                            scoreA.setText(String.format("%2d",sca));
-                            scoreB.setText(String.format("%2d",scb));
+                            scoreA.setText(String.format("%2d", sca));
+                            scoreB.setText(String.format("%2d", scb));
 
                             message.setText("Its your Chal Please play");
-                            for (int i = 0;i<=12;i++){
+                            for (int i = 0; i <= 12; i++) {
                                 cardsIV[i].setClickable(true);
                             }
-                        }else {
+                        } else {
 //                            fee_score_board.setVisibility(View.VISIBLE);
 //                            fee_score_A.setText(String.format("%2d",gameData.getFeesA()));
 //                            fee_score_B.setText(String.format("%2d",gameData.getFeesB()));
 
-                            if(mySeatNo == 1 || mySeatNo == 3){
-                                myscore.setText(String.format("%2d",gameData.getFeesA()));
-                                oppscore.setText(String.format("%2d",gameData.getFeesB()));
-                            }else {
-                                myscore.setText(String.format("%2d",gameData.getFeesB()));
-                                oppscore.setText(String.format("%2d",gameData.getFeesA()));
+                            if (mySeatNo == 1 || mySeatNo == 3) {
+                                myscore.setText(String.format("%2d", gameData.getFeesA()));
+                                oppscore.setText(String.format("%2d", gameData.getFeesB()));
+                            } else {
+                                myscore.setText(String.format("%2d", gameData.getFeesB()));
+                                oppscore.setText(String.format("%2d", gameData.getFeesA()));
                             }
 
 
 //                            score_board.setVisibility(View.VISIBLE);
 
-                            scoreA.setText(String.format("%2d",sca));
-                            scoreB.setText(String.format("%2d",scb));
+                            scoreA.setText(String.format("%2d", sca));
+                            scoreB.setText(String.format("%2d", scb));
 
-                            for (int i = 0;i<=12;i++){
+                            for (int i = 0; i <= 12; i++) {
                                 cardsIV[i].setClickable(false);
-                                message.setText("Please wait "+gameData.getPlayerAtSeat(gameData.getChal_seat())+" is playing");
+                            }
+                            message.setText("Please wait " + gameData.getPlayerAtSeat(gameData.getChal_seat()) + " is playing");
+
+                            if (gameData.getPlayerIDAtSeat(gameData.getChal_seat()).contains("COMPUTER") && mySeatNo == 1) {
+                                int cardPlayed = pc1.chalProcess(0, 0, 0, gameData.getChal_seat(), gameData.getClaim_color(), gameData.getDeck());
+                                gameData.setNextChalCard(cardPlayed);
+                                gameData.setNextChalData();
+                                updateDeckStringForPC(cardPlayed);
+
+                                final Handler handler = new Handler();
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        // Do something after 5s = 5000ms
+                                        reference2.setValue(gameData);
+                                    }
+                                }, 1000);
                             }
                         }
                         break;
                     case GameData.CHAL_2:
                         cardsound.start();
                         updateThrownCards();
-                        if(gameData.getChal_seat() == mySeatNo){
+                        if (gameData.getChal_seat() == mySeatNo) {
                             message.setText("Its your Chal Please play");
 
                             Card card = new Card(gameData.getChal_card_1());
                             int num = 0;
 
-                            for (int i = 0;i<=12;i++){
-                                if(card.getColor() == myCards[i].getColor()){
-                                    if(cardsIV[i].getVisibility() == View.VISIBLE){
+                            for (int i = 0; i <= 12; i++) {
+                                if (card.getColor() == myCards[i].getColor()) {
+                                    if (cardsIV[i].getVisibility() == View.VISIBLE) {
                                         cardsIV[i].setClickable(true);
                                         num++;
                                     }
                                 }
                             }
-                            if(num == 0){
-                                for (int i = 0;i<=12;i++){
+                            if (num == 0) {
+                                for (int i = 0; i <= 12; i++) {
                                     cardsIV[i].setClickable(true);
                                 }
-                            }else {
-                                num =0;
+                            } else {
+                                num = 0;
                             }
-                        }else {
-                            message.setText("Please wait "+gameData.getPlayerAtSeat(gameData.getChal_seat())+" is playing");
-                            for (int i = 0;i<=12;i++){
+                        } else {
+                            message.setText("Please wait " + gameData.getPlayerAtSeat(gameData.getChal_seat()) + " is playing");
+                            for (int i = 0; i <= 12; i++) {
                                 cardsIV[i].setClickable(false);
+                            }
+
+
+                            if (gameData.getPlayerIDAtSeat(gameData.getChal_seat()).contains("COMPUTER") && mySeatNo == 1) {
+                                int cardPlayed = pc1.chalProcess(gameData.getChal_card_1(), 0, 0, gameData.getChal_seat(), gameData.getClaim_color(), gameData.getDeck());
+                                gameData.setNextChalCard(cardPlayed);
+                                gameData.setNextChalData();
+                                updateDeckStringForPC(cardPlayed);
+
+                                final Handler handler = new Handler();
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        // Do something after 5s = 5000ms
+                                        reference2.setValue(gameData);
+                                    }
+                                }, 1000);
                             }
                         }
                         break;
                     case GameData.CHAL_3:
                         cardsound.start();
                         updateThrownCards();
-                        if(gameData.getChal_seat() == mySeatNo){
+                        if (gameData.getChal_seat() == mySeatNo) {
                             message.setText("Its your Chal Please play");
 
                             Card card = new Card(gameData.getChal_card_1());
                             int num = 0;
 
-                            for (int i = 0;i<=12;i++){
-                                if(card.getColor() == myCards[i].getColor()){
-                                    if(cardsIV[i].getVisibility() == View.VISIBLE){
+                            for (int i = 0; i <= 12; i++) {
+                                if (card.getColor() == myCards[i].getColor()) {
+                                    if (cardsIV[i].getVisibility() == View.VISIBLE) {
                                         cardsIV[i].setClickable(true);
                                         num++;
                                     }
                                 }
                             }
-                            if(num == 0){
-                                for (int i = 0;i<=12;i++){
+                            if (num == 0) {
+                                for (int i = 0; i <= 12; i++) {
                                     cardsIV[i].setClickable(true);
                                 }
-                            }else {
-                                num =0;
+                            } else {
+                                num = 0;
                             }
 
-                        }else {
-                            message.setText("Please wait "+gameData.getPlayerAtSeat(gameData.getChal_seat())+" is playing");
-                            for (int i = 0;i<=12;i++){
+                        } else {
+                            message.setText("Please wait " + gameData.getPlayerAtSeat(gameData.getChal_seat()) + " is playing");
+                            for (int i = 0; i <= 12; i++) {
                                 cardsIV[i].setClickable(false);
+                            }
+
+
+                            if (gameData.getPlayerIDAtSeat(gameData.getChal_seat()).contains("COMPUTER") && mySeatNo == 1) {
+                                int cardPlayed = pc1.chalProcess(gameData.getChal_card_2(), gameData.getChal_card_1(), 0, gameData.getChal_seat(), gameData.getClaim_color(), gameData.getDeck());
+                                gameData.setNextChalCard(cardPlayed);
+                                gameData.setNextChalData();
+                                updateDeckStringForPC(cardPlayed);
+
+                                final Handler handler = new Handler();
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        // Do something after 5s = 5000ms
+                                        reference2.setValue(gameData);
+                                    }
+                                }, 1000);
                             }
                         }
                         break;
                     case GameData.CHAL_4:
                         cardsound.start();
                         updateThrownCards();
-                        if(gameData.getChal_seat() == mySeatNo){
+                        if (gameData.getChal_seat() == mySeatNo) {
                             message.setText("Its your Chal Please play");
 
                             Card card = new Card(gameData.getChal_card_1());
                             int num = 0;
 
-                            for (int i = 0;i<=12;i++){
-                                if(card.getColor() == myCards[i].getColor()){
-                                    if(cardsIV[i].getVisibility() == View.VISIBLE){
+                            for (int i = 0; i <= 12; i++) {
+                                if (card.getColor() == myCards[i].getColor()) {
+                                    if (cardsIV[i].getVisibility() == View.VISIBLE) {
                                         cardsIV[i].setClickable(true);
                                         num++;
                                     }
                                 }
                             }
-                            if(num == 0){
-                                for (int i = 0;i<=12;i++){
+                            if (num == 0) {
+                                for (int i = 0; i <= 12; i++) {
                                     cardsIV[i].setClickable(true);
                                 }
-                            }else {
-                                num =0;
+                            } else {
+                                num = 0;
                             }
 
-                        }else {
-                            message.setText("Please wait "+gameData.getPlayerAtSeat(gameData.getChal_seat())+" is playing");
-                            for (int i = 0;i<=12;i++){
+                        } else {
+                            message.setText("Please wait " + gameData.getPlayerAtSeat(gameData.getChal_seat()) + " is playing");
+                            for (int i = 0; i <= 12; i++) {
                                 cardsIV[i].setClickable(false);
                             }
+
+                            if (gameData.getPlayerIDAtSeat(gameData.getChal_seat()).contains("COMPUTER") && mySeatNo == 1) {
+                                int cardPlayed = pc1.chalProcess(gameData.getChal_card_3(),gameData.getChal_card_2(), gameData.getChal_card_1(),  gameData.getChal_seat(), gameData.getClaim_color(), gameData.getDeck());
+                                gameData.setNextChalCard(cardPlayed);
+                                gameData.setNextChalData();
+                                updateDeckStringForPC(cardPlayed);
+
+                                final Handler handler = new Handler();
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        // Do something after 5s = 5000ms
+                                        reference2.setValue(gameData);
+                                    }
+                                }, 1000);
+                            }
+
                         }
                         break;
                     case GameData.CHAL_RESULT:
                         cardsound.start();
                         updateThrownCards();
-                        for (int i = 0;i<=12;i++){
+                        for (int i = 0; i <= 12; i++) {
                             cardsIV[i].setClickable(false);
                         }
 
@@ -1055,11 +1340,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                             } else {
                                 gameData.calculate_chal_result();
 
-                                if(gameData.getClaim_seat() == 1 || gameData.getClaim_seat() == 3 ){
+                                if (gameData.getClaim_seat() == 1 || gameData.getClaim_seat() == 3) {
 
-                                    if(gameData.getClaim_number() > gameData.getFeesA()){
-                                        gameData.setScoreA( gameData.getScoreA() - (gameData.getClaim_number()*(gameData.getClaim_number() - gameData.getFeesA() + 1)));
-                                    }else {
+                                    if (gameData.getClaim_number() > gameData.getFeesA()) {
+                                        gameData.setScoreA(gameData.getScoreA() - (gameData.getClaim_number() * (gameData.getClaim_number() - gameData.getFeesA() + 1)));
+                                    } else {
 
                                         gameData.setScoreA(gameData.getScoreA() + gameData.getFeesA());
 
@@ -1069,11 +1354,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 //                                            gameData.setScoreA(0);
 //                                        }
                                     }
-                                }else {
+                                } else {
 
-                                    if(gameData.getClaim_number() > gameData.getFeesB()){
-                                        gameData.setScoreA( gameData.getScoreA() + (gameData.getClaim_number()*(gameData.getClaim_number() - gameData.getFeesB() + 1)));
-                                    }else {
+                                    if (gameData.getClaim_number() > gameData.getFeesB()) {
+                                        gameData.setScoreA(gameData.getScoreA() + (gameData.getClaim_number() * (gameData.getClaim_number() - gameData.getFeesB() + 1)));
+                                    } else {
                                         gameData.setScoreA(gameData.getScoreA() - gameData.getFeesB());
 
 //                                        gameData.setScoreB(gameData.getScoreB() - gameData.getFeesB());
@@ -1084,12 +1369,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                     }
                                 }
 
-                                if(gameData.getShufflingSeat() == 1 || gameData.getShufflingSeat() == 3){
-                                    if(gameData.getScoreA() > 0){
+                                if (gameData.getShufflingSeat() == 1 || gameData.getShufflingSeat() == 3) {
+                                    if (gameData.getScoreA() > 0) {
                                         gameData.setShufflingSeat(gameData.getnextSeat(gameData.getShufflingSeat()));
                                     }
-                                }else {
-                                    if(gameData.getScoreA() < 0){
+                                } else {
+                                    if (gameData.getScoreA() < 0) {
                                         gameData.setShufflingSeat(gameData.getnextSeat(gameData.getShufflingSeat()));
                                     }
                                 }
@@ -1105,7 +1390,66 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                     reference2.setValue(gameData);
                                 }
                             }, 3000);
-                        }
+                        }else if(gameData.getPlayerIDAtSeat(gameData.getPrvSeat(gameData.getChal_seat())).contains("COMPUTER")
+                                && mySeatNo == 1){
+                            if (gameData.getChal_round() < 13) {
+                                gameData.calculate_chal_result();
+                                gameData.setState(GameData.CHAL_1);
+
+                            } else {
+                                gameData.calculate_chal_result();
+
+                                if (gameData.getClaim_seat() == 1 || gameData.getClaim_seat() == 3) {
+
+                                    if (gameData.getClaim_number() > gameData.getFeesA()) {
+                                        gameData.setScoreA(gameData.getScoreA() - (gameData.getClaim_number() * (gameData.getClaim_number() - gameData.getFeesA() + 1)));
+                                    } else {
+
+                                        gameData.setScoreA(gameData.getScoreA() + gameData.getFeesA());
+
+//                                        gameData.setScoreA(gameData.getScoreA() - gameData.getFeesA());
+//                                        if(gameData.getScoreA() < 0){
+//                                            gameData.setScoreB(0 - gameData.getScoreA());
+//                                            gameData.setScoreA(0);
+//                                        }
+                                    }
+                                } else {
+
+                                    if (gameData.getClaim_number() > gameData.getFeesB()) {
+                                        gameData.setScoreA(gameData.getScoreA() + (gameData.getClaim_number() * (gameData.getClaim_number() - gameData.getFeesB() + 1)));
+                                    } else {
+                                        gameData.setScoreA(gameData.getScoreA() - gameData.getFeesB());
+
+//                                        gameData.setScoreB(gameData.getScoreB() - gameData.getFeesB());
+//                                        if(gameData.getScoreB() < 0){
+//                                            gameData.setScoreA(0 - gameData.getScoreB());
+//                                            gameData.setScoreB(0);
+//                                        }
+                                    }
+                                }
+
+                                if (gameData.getShufflingSeat() == 1 || gameData.getShufflingSeat() == 3) {
+                                    if (gameData.getScoreA() > 0) {
+                                        gameData.setShufflingSeat(gameData.getnextSeat(gameData.getShufflingSeat()));
+                                    }
+                                } else {
+                                    if (gameData.getScoreA() < 0) {
+                                        gameData.setShufflingSeat(gameData.getnextSeat(gameData.getShufflingSeat()));
+                                    }
+                                }
+                                gameData.setState(GameData.SHUFFLING);
+
+                            }
+
+                            final Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    // Do something after 5s = 5000ms
+                                    reference2.setValue(gameData);
+                                }
+                            }, 3000);
+                    }
 
                         break;
                 }
@@ -1124,15 +1468,15 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(View v) {
 
-                if(btn_Shuffle.getText().toString().equals("Press to Shuffle")){
-                  //  btn_Shuffle.setEnabled(false);
+                if (btn_Shuffle.getText().toString().equals("Press to Shuffle")) {
+                    //  btn_Shuffle.setEnabled(false);
                     btn_Shuffle.setText("Please Wait..");
                     deck.shuffle(100);
                     btn_Shuffle.setText("Press to Distribute");
                     btn_Shuffle.setEnabled(true);
-                }else if(btn_Shuffle.getText().toString().equals("Press to Distribute")){
-                 //   btn_Shuffle.setEnabled(false);
-                 //   btn_Shuffle.setText("Please Wait..");
+                } else if (btn_Shuffle.getText().toString().equals("Press to Distribute")) {
+                    //   btn_Shuffle.setEnabled(false);
+                    //   btn_Shuffle.setText("Please Wait..");
 
                     gameData.setDeck(deck.toString());
                     gameData.setState(GameData.COLLECT_CARDS);
@@ -1145,10 +1489,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void updateThrownCards() {
-        int prvSeat =  (gameData.getChal_seat() == 1)?(4):(gameData.getChal_seat()-1);
-        int tSeat= prvSeat - mySeatNo;
-        if(tSeat<0){
-             tSeat = 4 + tSeat;
+        int prvSeat = (gameData.getChal_seat() == 1) ? (4) : (gameData.getChal_seat() - 1);
+        int tSeat = prvSeat - mySeatNo;
+        if (tSeat < 0) {
+            tSeat = 4 + tSeat;
         }
         thrown_cards[tSeat].setImageResource(gameData.getLastThrownCard().getRes());
         thrown_cards[tSeat].setVisibility(View.VISIBLE);
@@ -1218,8 +1562,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         thrown_cards[3].setVisibility(View.INVISIBLE);
 
 
-
-        for (int i = 0;i<=12;i++){
+        for (int i = 0; i <= 12; i++) {
             cardsIV[i].setVisibility(View.INVISIBLE);
             cardsIV[i].setOnClickListener(this);
         }
@@ -1227,7 +1570,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.iv_card1:
                 cardsIV[0].setVisibility(View.INVISIBLE);
                 gameData.setNextChalCard(myCards[0].getCardNo());
@@ -1369,9 +1712,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.btn_pass:
                 popupWindow.dismiss();
-                if(gameData.getClaim_number() == 1){
+                if (gameData.getClaim_number() == 1) {
                     gameData.setNextClaimNumber(7);
-                }else {
+                } else {
                     gameData.setNextClaimNumber(0);
                 }
                 gameData.setNextClaimData();
@@ -1380,34 +1723,35 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_spades:
                 popupWindow.dismiss();
                 gameData.setClaim_color(1);
-                gameData.setChalof(mySeatNo,25);
+                gameData.setChalof(mySeatNo, 25);
                 gameData.setState(GameData.CLAIM_READY);
                 reference2.setValue(gameData);
                 break;
             case R.id.btn_club:
                 popupWindow.dismiss();
                 gameData.setClaim_color(2);
-                gameData.setChalof(mySeatNo,25);
+                gameData.setChalof(mySeatNo, 25);
                 gameData.setState(GameData.CLAIM_READY);
                 reference2.setValue(gameData);
                 break;
             case R.id.btn_heart:
                 popupWindow.dismiss();
                 gameData.setClaim_color(4);
-                gameData.setChalof(mySeatNo,25);
+                gameData.setChalof(mySeatNo, 25);
                 gameData.setState(GameData.CLAIM_READY);
                 reference2.setValue(gameData);
                 break;
             case R.id.btn_diamond:
                 popupWindow.dismiss();
                 gameData.setClaim_color(3);
-                gameData.setChalof(mySeatNo,25);
+                gameData.setChalof(mySeatNo, 25);
                 gameData.setState(GameData.CLAIM_READY);
                 reference2.setValue(gameData);
                 break;
             case R.id.btn_start:
                 popupWindow2.dismiss();
-                switch (mySeatNo){
+
+                switch (mySeatNo) {
                     case 1:
                         reference2.child("chal_card_1").setValue(25);
                         break;
@@ -1422,6 +1766,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                         break;
 
                 }
+                if (gameData.getClaim_seat() == mySeatNo) {
+                    reference2.setValue(gameData);
+                }
                 break;
 
         }
@@ -1430,7 +1777,20 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private void updateDeckString(int position) {
         String temp = gameData.getDeck();
         StringBuilder stringBuilder = new StringBuilder(temp);
-        stringBuilder.replace(((mySeatNo-1)*26)+((position-1)*2),((mySeatNo-1)*26)+((position-1)*2)+2,"00");
+        stringBuilder.replace(((mySeatNo - 1) * 26) + ((position - 1) * 2), ((mySeatNo - 1) * 26) + ((position - 1) * 2) + 2, "00");
         gameData.setDeck(stringBuilder.toString());
+    }
+
+    private void updateDeckStringForPC(int playedCard) {
+        String temp = gameData.getDeck();
+        StringBuilder stringBuilder = new StringBuilder(temp);
+        int cardNum = 0;
+        for (int i = 0; i <= 51; i += 2) {
+            cardNum = Integer.parseInt(temp.substring(i, i + 2));
+            if (cardNum == playedCard) {
+                stringBuilder.replace(i, i + 2, "00");
+                gameData.setDeck(stringBuilder.toString());
+            }
+        }
     }
 }

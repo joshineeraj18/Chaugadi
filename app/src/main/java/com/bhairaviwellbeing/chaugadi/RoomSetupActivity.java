@@ -31,6 +31,8 @@ import java.util.Map;
 public class RoomSetupActivity extends AppCompatActivity implements View.OnClickListener {
 
     Button start;
+    Button add_pc;
+
     LinearLayout player1_dp;
     LinearLayout player2_dp;
     LinearLayout player3_dp;
@@ -141,6 +143,7 @@ public class RoomSetupActivity extends AppCompatActivity implements View.OnClick
         player3.setOnClickListener(this);
         player4.setOnClickListener(this);
         start.setOnClickListener(this);
+        add_pc.setOnClickListener(this);
 
 
 
@@ -197,6 +200,8 @@ public class RoomSetupActivity extends AppCompatActivity implements View.OnClick
                     player3_id =gameData.getId3();
                     player4_id =gameData.getId4();
 
+                    add_pc.setVisibility(View.VISIBLE);
+
 
 
                     if (!player2_name.equals("empty")) {
@@ -219,6 +224,7 @@ public class RoomSetupActivity extends AppCompatActivity implements View.OnClick
                         player4.setText(player4_name);
                         player4.setVisibility(View.VISIBLE);
 
+                        add_pc.setEnabled(false);
 
                         player1DP.setText(player1_name);
                         relativeLayout.setVisibility(View.VISIBLE);
@@ -337,6 +343,7 @@ public class RoomSetupActivity extends AppCompatActivity implements View.OnClick
 
     private void setupView() {
         start = findViewById(R.id.btn_start);
+        add_pc = findViewById(R.id.add_pc);
 
         player1_dp = findViewById(R.id.linlay_player1);
         player2_dp = findViewById(R.id.linlay_player2);
@@ -360,6 +367,8 @@ public class RoomSetupActivity extends AppCompatActivity implements View.OnClick
         player4_dp.setVisibility(View.GONE);
 
         start.setEnabled(false);
+        add_pc.setEnabled(true);
+        add_pc.setVisibility(View.INVISIBLE);
 
         player2.setVisibility(View.GONE);
         player3.setVisibility(View.GONE);
@@ -528,9 +537,24 @@ public class RoomSetupActivity extends AppCompatActivity implements View.OnClick
                             gameData.setShufflingSeat(2);
                             gameData.setState(GameData.IDEAL);
                             gameData.setChal_card_1(25);
-                            gameData.setChal_card_2(0);
-                            gameData.setChal_card_3(0);
-                            gameData.setChal_card_4(0);
+
+                            if(gameData.getId2().contains("COMPUTER")){
+                                gameData.setChal_card_2(25);
+                            }else {
+                                gameData.setChal_card_2(0);
+                            }
+
+                            if(gameData.getId3().contains("COMPUTER")){
+                                gameData.setChal_card_3(25);
+                            }else {
+                                gameData.setChal_card_3(0);
+                            }
+                            if(gameData.getId4().contains("COMPUTER")){
+                                gameData.setChal_card_4(25);
+                            }else {
+                                gameData.setChal_card_4(0);
+                            }
+
                             gameData.setGameStarted(true);
 
                             reference2.setValue(gameData).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -557,6 +581,27 @@ public class RoomSetupActivity extends AppCompatActivity implements View.OnClick
 
 
                 }
+                break;
+
+            case R.id.add_pc:
+
+                if(gameData.getPlayer2().equals("empty")){
+                    gameData.addPlayer("Com 1","COMPUTER1");
+                    gameData.setChal_card_2(25);
+                    reference2.setValue(gameData);
+                }else if(gameData.getPlayer3().equals("empty")){
+                    gameData.addPlayer("Com 2","COMPUTER2");
+                    gameData.setChal_card_3(25);
+                    reference2.setValue(gameData);
+                }else if(gameData.getPlayer4().equals("empty")){
+                    gameData.addPlayer("Com 3","COMPUTER3");
+                    gameData.setChal_card_4(25);
+                    reference2.setValue(gameData);
+                }else {
+
+                }
+
+
                 break;
 
                 default:
