@@ -37,6 +37,7 @@ public class TestActivity extends AppCompatActivity {
     TextView room_no_tv;
 
     DatabaseReference reference;
+    DatabaseReference referenceforrooms;
     FirebaseUser user;
 
 
@@ -48,18 +49,36 @@ public class TestActivity extends AppCompatActivity {
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         reference = FirebaseDatabase.getInstance().getReference("Users").child(user.getUid());
+        referenceforrooms = FirebaseDatabase.getInstance().getReference("Rooms");
 
         reference.child("room").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                String room_no = dataSnapshot.getValue(String.class);
+                final String room_no = dataSnapshot.getValue(String.class);
+
                 if(!room_no.equals("no-room")){
-                    Intent intent = new Intent(TestActivity.this,GameActivity.class);
-                    intent.putExtra("Room",room_no);
-                    intent.putExtra("Activity","TestActivity");
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                    finish();
+
+                    referenceforrooms.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if(dataSnapshot.hasChild(room_no)){
+//                                Intent intent = new Intent(TestActivity.this,GameActivity.class);
+//                                intent.putExtra("Room",room_no);
+//                                intent.putExtra("Activity","TestActivity");
+//                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+//                                startActivity(intent);
+//                                finish();
+                            }else {
+                                reference.child("room").setValue("no-room");
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
                 }
             }
 

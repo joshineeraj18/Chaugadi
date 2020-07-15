@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -29,6 +30,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +50,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     int mySeatNo = 0;
     GameData gameData;
     Card myCards[];
+    Card tempCards[];
 
     ImageView cardsIV[];
     ImageView thrown_cards[];
@@ -93,8 +96,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     Map<String, Integer> claim_result_3 = new HashMap<String, Integer>();
     Map<String, Integer> claim_result_4 = new HashMap<String, Integer>();
 
+    RelativeLayout score_bar;
+    Button tuser1, tuser2, tuser3, tuser4;
+    ImageView t_iv_cards[];
+
 
     int sca, scb;
+
+    int t_user = 1;
 
     ValueEventListener ve1;
 
@@ -200,6 +209,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         im_deck_shuffle.setVisibility(View.GONE);
 
         pc1 = new Computer();
+        score_bar.setOnClickListener(this);
+
 
         cardsound = MediaPlayer.create(GameActivity.this, R.raw.cardthrow1);
 
@@ -399,12 +410,57 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
                         btn_Shuffle.setVisibility(View.INVISIBLE);
                         im_deck_shuffle.setVisibility(View.INVISIBLE);
+
                         for (int i = 0; i <= 12; i++) {
                             for (int j = 0; j < 12 - i; j++) {
                                 if (myCards[j].getCardNo() < myCards[j + 1].getCardNo()) {
                                     Card tmp = myCards[j];
                                     myCards[j] = myCards[j + 1];
                                     myCards[j + 1] = tmp;
+                                }
+                            }
+                        }
+
+                        if (mySeatNo == 1) {
+                            for (int in = 1; in <= 4; in++) {
+                                    //Sort computer cards
+                                    deck = new Deck(gameData.getDeck());
+                                    myCards = deck.getCards(((in - 1) * 13), in * 13 - 1);
+
+                                    for (int i = 0; i <= 12; i++) {
+                                        for (int j = 0; j < 12 - i; j++) {
+                                            if (myCards[j].getCardNo() < myCards[j + 1].getCardNo()) {
+                                                Card tmp = myCards[j];
+                                                myCards[j] = myCards[j + 1];
+                                                myCards[j + 1] = tmp;
+                                            }
+                                        }
+                                    }
+
+                                String temp = new String();
+                                for (int i = 0; i <= 12; i++) {
+                                    temp = myCards[i].toString() + temp;
+                                }
+
+
+                                String tmp2 = new String();
+                                switch (in) {
+                                    case 1:
+                                        tmp2 = temp + gameData.getDeck().substring(26);
+                                        gameData.setDeck(tmp2);
+                                        break;
+                                    case 2:
+                                        tmp2 = gameData.getDeck().substring(0, 26) + temp + gameData.getDeck().substring(52);
+                                        gameData.setDeck(tmp2);
+                                        break;
+                                    case 3:
+                                        tmp2 = gameData.getDeck().substring(0, 52) + temp + gameData.getDeck().substring(78);
+                                        gameData.setDeck(tmp2);
+                                        break;
+                                    case 4:
+                                        tmp2 = gameData.getDeck().substring(0, 78) + temp;
+                                        gameData.setDeck(tmp2);
+                                        break;
                                 }
                             }
                         }
@@ -418,7 +474,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                         }
 
                         if (mySeatNo == gameData.getShufflingSeat()) {
-
                             gameData.setClaim_seat(gameData.getnextSeat(gameData.getShufflingSeat()));
                             gameData.setClaim_number(1);
 
@@ -943,12 +998,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                         break;
                     }
                     case GameData.CLAIM_READY:
-
                         if (gameData.getClaim_seat() == mySeatNo) {
                             if (gameData.getChalof(1) == 25 &&
                                     gameData.getChalof(2) == 25 &&
                                     gameData.getChalof(3) == 25 &&
                                     gameData.getChalof(4) == 25) {
+
                                 LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
                                 final View popupView3 = inflater.inflate(R.layout.popup_claim_ready, null);
 
@@ -1307,7 +1362,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                             }
 
                             if (gameData.getPlayerIDAtSeat(gameData.getChal_seat()).contains("COMPUTER") && mySeatNo == 1) {
-                                int cardPlayed = pc1.chalProcess(gameData.getChal_card_3(),gameData.getChal_card_2(), gameData.getChal_card_1(),  gameData.getChal_seat(), gameData.getClaim_color(), gameData.getDeck());
+                                int cardPlayed = pc1.chalProcess(gameData.getChal_card_3(), gameData.getChal_card_2(), gameData.getChal_card_1(), gameData.getChal_seat(), gameData.getClaim_color(), gameData.getDeck());
                                 gameData.setNextChalCard(cardPlayed);
                                 gameData.setNextChalData();
                                 updateDeckStringForPC(cardPlayed);
@@ -1390,8 +1445,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                     reference2.setValue(gameData);
                                 }
                             }, 3000);
-                        }else if(gameData.getPlayerIDAtSeat(gameData.getPrvSeat(gameData.getChal_seat())).contains("COMPUTER")
-                                && mySeatNo == 1){
+                        } else if (gameData.getPlayerIDAtSeat(gameData.getPrvSeat(gameData.getChal_seat())).contains("COMPUTER")
+                                && mySeatNo == 1) {
                             if (gameData.getChal_round() < 13) {
                                 gameData.calculate_chal_result();
                                 gameData.setState(GameData.CHAL_1);
@@ -1449,7 +1504,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                     reference2.setValue(gameData);
                                 }
                             }, 3000);
-                    }
+                        }
 
                         break;
                 }
@@ -1560,6 +1615,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         thrown_cards[1].setVisibility(View.INVISIBLE);
         thrown_cards[2].setVisibility(View.INVISIBLE);
         thrown_cards[3].setVisibility(View.INVISIBLE);
+
+        score_bar = findViewById(R.id.score_bar);
 
 
         for (int i = 0; i <= 12; i++) {
@@ -1770,8 +1827,164 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     reference2.setValue(gameData);
                 }
                 break;
+            case R.id.score_bar:
+                popupforAllcards();
+                break;
+            case R.id.btn_u1:
+                t_user = 1;
+                deck = new Deck(gameData.getDeck());
+                tempCards = deck.getCards(((t_user - 1) * 13), t_user * 13 - 1);
+                Arrays.sort(tempCards);
+
+//                for (int i = 0; i <= 12; i++) {
+//                    for (int j = 0; j < 12 - i; j++) {
+//                        if (tempCards[j].getCardNo() < tempCards[j + 1].getCardNo()) {
+//                            Card tmp = tempCards[j];
+//                            tempCards[j] = tempCards[j + 1];
+//                            tempCards[j + 1] = tmp;
+//                        }
+//                    }
+//                }
+                for (int i = 0; i <= 12; i++) {
+                    t_iv_cards[i].setImageResource(tempCards[i].getRes());
+                }
+                break;
+            case R.id.btn_u2:
+                t_user = 2;
+                deck = new Deck(gameData.getDeck());
+                tempCards = deck.getCards(((t_user - 1) * 13), t_user * 13 - 1);
+                Arrays.sort(tempCards);
+//                for (int i = 0; i <= 12; i++) {
+//                    for (int j = 0; j < 12 - i; j++) {
+//                        if (tempCards[j].getCardNo() < tempCards[j + 1].getCardNo()) {
+//                            Card tmp = tempCards[j];
+//                            tempCards[j] = tempCards[j + 1];
+//                            tempCards[j + 1] = tmp;
+//                        }
+//                    }
+//                }
+                for (int i = 0; i <= 12; i++) {
+                    t_iv_cards[i].setImageResource(tempCards[i].getRes());
+                }
+                break;
+            case R.id.btn_u3:
+                t_user = 3;
+                deck = new Deck(gameData.getDeck());
+                tempCards = deck.getCards(((t_user - 1) * 13), t_user * 13 - 1);
+                Arrays.sort(tempCards);
+//                for (int i = 0; i <= 12; i++) {
+//                    for (int j = 0; j < 12 - i; j++) {
+//                        if (tempCards[j].getCardNo() < tempCards[j + 1].getCardNo()) {
+//                            Card tmp = tempCards[j];
+//                            tempCards[j] = tempCards[j + 1];
+//                            tempCards[j + 1] = tmp;
+//                        }
+//                    }
+//                }
+                for (int i = 0; i <= 12; i++) {
+                    t_iv_cards[i].setImageResource(tempCards[i].getRes());
+                }
+                break;
+            case R.id.btn_u4:
+                t_user = 4;
+                deck = new Deck(gameData.getDeck());
+                tempCards = deck.getCards(((t_user - 1) * 13), t_user * 13 - 1);
+                Arrays.sort(tempCards);
+//                for (int i = 0; i <= 12; i++) {
+//                    for (int j = 0; j < 12 - i; j++) {
+//                        if (tempCards[j].getCardNo() < tempCards[j + 1].getCardNo()) {
+//                            Card tmp = tempCards[j];
+//                            tempCards[j] = tempCards[j + 1];
+//                            tempCards[j + 1] = tmp;
+//                        }
+//                    }
+//                }
+                for (int i = 0; i <= 12; i++) {
+                    t_iv_cards[i].setImageResource(tempCards[i].getRes());
+                }
+                break;
+
 
         }
+    }
+
+    private void popupforAllcards() {
+
+        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        final View popupView = inflater.inflate(R.layout.popup_cardview, null);
+
+        DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        final int width = dm.widthPixels;
+        final int height = dm.heightPixels;
+
+        boolean focusable = true;
+        popupWindow = new PopupWindow(popupView, (int) (width * 0.7), (int) (height * 0.6), focusable);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            popupWindow.setElevation(20);
+        }
+
+        findViewById(R.id.game_layout).post(new Runnable() {
+            @Override
+            public void run() {
+                popupWindow.showAtLocation(findViewById(R.id.game_layout), Gravity.CENTER, 0, 0);
+            }
+        });
+        popupWindow.setOutsideTouchable(false);
+
+//        popupWindow.setTouchInterceptor(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent motionEvent) {
+//                if (motionEvent.getX() < 0 || motionEvent.getX() > (int) (width * 0.46))
+//                    return true;
+//                if (motionEvent.getY() < 0 || motionEvent.getY() > (int) (height * 0.3))
+//                    return true;
+//                return false;
+//            }
+//        });
+
+
+        tuser1 = popupView.findViewById(R.id.btn_u1);
+        tuser2 = popupView.findViewById(R.id.btn_u2);
+        tuser3 = popupView.findViewById(R.id.btn_u3);
+        tuser4 = popupView.findViewById(R.id.btn_u4);
+
+        tuser1.setOnClickListener(this);
+        tuser2.setOnClickListener(this);
+        tuser3.setOnClickListener(this);
+        tuser4.setOnClickListener(this);
+
+        tuser1.setText(gameData.getPlayerAtSeat(1));
+        tuser2.setText(gameData.getPlayerAtSeat(2));
+        tuser3.setText(gameData.getPlayerAtSeat(3));
+        tuser4.setText(gameData.getPlayerAtSeat(4));
+
+        t_iv_cards = new ImageView[13];
+
+
+        t_iv_cards[0] = popupView.findViewById(R.id.iv_cardt1);
+        t_iv_cards[1] = popupView.findViewById(R.id.iv_cardt2);
+        t_iv_cards[2] = popupView.findViewById(R.id.iv_cardt3);
+        t_iv_cards[3] = popupView.findViewById(R.id.iv_cardt4);
+        t_iv_cards[4] = popupView.findViewById(R.id.iv_cardt5);
+        t_iv_cards[5] = popupView.findViewById(R.id.iv_cardt7);
+        t_iv_cards[6] = popupView.findViewById(R.id.iv_cardt8);
+        t_iv_cards[7] = popupView.findViewById(R.id.iv_cardt6);
+        t_iv_cards[8] = popupView.findViewById(R.id.iv_cardt9);
+        t_iv_cards[9] = popupView.findViewById(R.id.iv_cardt10);
+        t_iv_cards[10] = popupView.findViewById(R.id.iv_cardt11);
+        t_iv_cards[11] = popupView.findViewById(R.id.iv_cardt12);
+        t_iv_cards[12] = popupView.findViewById(R.id.iv_cardt13);
+
+        deck = new Deck(gameData.getDeck());
+        tempCards = deck.getCards(((t_user - 1) * 13), t_user * 13 - 1);
+
+        for (int i = 0; i <= 12; i++) {
+            t_iv_cards[i].setImageResource(tempCards[i].getRes());
+        }
+
+
     }
 
     private void updateDeckString(int position) {
@@ -1785,12 +1998,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         String temp = gameData.getDeck();
         StringBuilder stringBuilder = new StringBuilder(temp);
         int cardNum = 0;
-        for (int i = 0; i <= 51; i += 2) {
+      here:  for (int i = 0; i <= 51; i += 2) {
             cardNum = Integer.parseInt(temp.substring(i, i + 2));
             if (cardNum == playedCard) {
                 stringBuilder.replace(i, i + 2, "00");
                 gameData.setDeck(stringBuilder.toString());
+                break here;
             }
+
         }
     }
 }
