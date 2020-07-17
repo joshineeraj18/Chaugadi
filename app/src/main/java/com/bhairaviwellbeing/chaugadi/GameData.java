@@ -10,10 +10,10 @@ public class GameData {
     private int feesA;
     private int feesB;
 
-    private String player1 ="empty";
-    private String player2 ="empty";
-    private String player3 ="empty";
-    private String player4 ="empty";
+    private String player1 = "empty";
+    private String player2 = "empty";
+    private String player3 = "empty";
+    private String player4 = "empty";
 
     private String id1;
     private String id2;
@@ -48,7 +48,6 @@ public class GameData {
     public static final int CLAIM = 8;
     public static final int CLAIM_COLOR = 9;
     public static final int CLAIM_READY = 10;
-
 
 
     private boolean isGameStarted = false;
@@ -177,27 +176,27 @@ public class GameData {
         this.id4 = id4;
     }
 
-    public int addPlayer(String name, String id){
-        if(this.player1.equals("empty")){
+    public int addPlayer(String name, String id) {
+        if (this.player1.equals("empty")) {
             this.player1 = name;
             this.id1 = id;
             return 1;
-        }else {
-            if(this.player2.equals("empty")){
+        } else {
+            if (this.player2.equals("empty")) {
                 this.player2 = name;
                 this.id2 = id;
                 return 2;
-            }else {
-                if(this.player3.equals("empty")){
+            } else {
+                if (this.player3.equals("empty")) {
                     this.player3 = name;
                     this.id3 = id;
                     return 3;
-                }else {
-                    if(this.player4.equals("empty")){
+                } else {
+                    if (this.player4.equals("empty")) {
                         this.player4 = name;
                         this.id4 = id;
                         return 4;
-                    }else {
+                    } else {
                         return 0;
                     }
                 }
@@ -206,16 +205,16 @@ public class GameData {
 
     }
 
-    public int getMyPosition(String userid){
-        if(userid.equals(this.id1)){
+    public int getMyPosition(String userid) {
+        if (userid.equals(this.id1)) {
             return 1;
-        }else if(userid.equals(this.id2)){
+        } else if (userid.equals(this.id2)) {
             return 2;
-        }else if(userid.equals(this.id3)){
+        } else if (userid.equals(this.id3)) {
             return 3;
-        }else if(userid.equals(this.id4)){
+        } else if (userid.equals(this.id4)) {
             return 4;
-        }else {
+        } else {
             return 0;
         }
 
@@ -233,7 +232,7 @@ public class GameData {
         return deck;
     }
 
-    public void setDeck(String deck) {
+    private void setDeck(String deck) {
         this.deck = deck;
     }
 
@@ -261,25 +260,25 @@ public class GameData {
         this.chal_number = chal_number;
     }
 
-    public void setNextChalData(){
+    public void setNextChalData() {
 
 
-        if(this.chal_seat == 4){
+        if (this.chal_seat == 4) {
             this.chal_seat = 1;
-        }else {
+        } else {
             this.chal_seat++;
         }
 
         this.chal_number++;
 
 
-        if(this.state == 3){
+        if (this.state == 3) {
             this.state = CHAL_2;
-        }else if(this.state == 4){
+        } else if (this.state == 4) {
             this.state = CHAL_3;
-        }else if(this.state == 5){
+        } else if (this.state == 5) {
             this.state = CHAL_4;
-        }else if(this.state == 6){
+        } else if (this.state == 6) {
             this.state = CHAL_RESULT;
         }
 
@@ -317,25 +316,23 @@ public class GameData {
         this.chal_card_4 = chal_card_4;
     }
 
-    public void setNextChalCard(int cardNum){
-        if(this.getChal_number() == 1){
+    public void setNextChalCard(int cardNum) {
+
+        if (this.getChal_number() == 1) {
             this.chal_card_1 = cardNum;
-        }
-        if(this.getChal_number() == 2){
+        } else if (this.getChal_number() == 2) {
             this.chal_card_2 = cardNum;
-        }
-        if(this.getChal_number() == 3){
+        } else if (this.getChal_number() == 3) {
             this.chal_card_3 = cardNum;
-        }
-        if(this.getChal_number() == 4){
+        } else if (this.getChal_number() == 4) {
             this.chal_card_4 = cardNum;
         }
 
     }
 
-    public Card getLastThrownCard(){
+    public Card getLastThrownCard() {
 
-        switch (this.state){
+        switch (this.state) {
             case CHAL_1:
                 return null;
             case CHAL_2:
@@ -352,9 +349,9 @@ public class GameData {
         }
     }
 
-    public String getPlayerAtSeat(int seat){
+    public String getPlayerAtSeat(int seat) {
 
-        switch (seat){
+        switch (seat) {
             case 1:
                 return player1;
             case 2:
@@ -369,9 +366,9 @@ public class GameData {
     }
 
 
-    public String getPlayerIDAtSeat(int seat){
+    public String getPlayerIDAtSeat(int seat) {
 
-        switch (seat){
+        switch (seat) {
             case 1:
                 return id1;
             case 2:
@@ -401,72 +398,70 @@ public class GameData {
         this.claim_number = claim_number;
     }
 
-    public void setNextClaimNumber(int claim_number){
-        if(this.getClaim_number() == 1){
+    public void setNextClaimNumber(int claim_number) {
+        if (this.getClaim_number() == 1) {
             this.chal_card_1 = claim_number;
         }
-        if(this.getClaim_number() == 2){
+        if (this.getClaim_number() == 2) {
             this.chal_card_2 = claim_number;
         }
-        if(this.getClaim_number() == 3){
+        if (this.getClaim_number() == 3) {
             this.chal_card_3 = claim_number;
         }
-        if(this.getClaim_number() == 4){
+        if (this.getClaim_number() == 4) {
             this.chal_card_4 = claim_number;
         }
 
     }
 
-    public void setNextClaimData(){
+    public void setNextClaimData() {
 
-            if(this.claim_number == 4){
+        if (this.claim_number == 4) {
 
-            Integer[] claimNm = {this.chal_card_1,this.chal_card_2,this.chal_card_3,this.chal_card_4};
+            Integer[] claimNm = {this.chal_card_1, this.chal_card_2, this.chal_card_3, this.chal_card_4};
             int max = Collections.max(Arrays.asList(claimNm));
             int index;
 
-            if(max == this.chal_card_1){
+            if (max == this.chal_card_1) {
                 index = 0;
                 this.claim_number = max;
-            }else if(max == this.chal_card_2){
+            } else if (max == this.chal_card_2) {
                 index = 1;
                 this.claim_number = max;
-            }else if(max == this.chal_card_3){
+            } else if (max == this.chal_card_3) {
                 index = 2;
                 this.claim_number = max;
-            }else {
+            } else {
                 index = 3;
                 this.claim_number = max;
             }
 
-            for(int i=0; i<=index; i++){
+            for (int i = 0; i <= index; i++) {
                 this.claim_seat = getnextSeat(this.claim_seat);
             }
             this.chal_seat = this.claim_seat;
             this.chal_round = 1;
             this.chal_number = 1;
 
-        }else {
+        } else {
             this.claim_number++;
             this.claim_seat = this.getnextSeat(this.claim_seat);
         }
     }
 
-    public  int getPrvSeat(int seat)
-    {
-        if(seat == 1){
+    public int getPrvSeat(int seat) {
+        if (seat == 1) {
             seat = 4;
-        }else {
+        } else {
             seat--;
         }
         return seat;
     }
 
-    public  int getnextSeat(int seat)
-    {
-        if(seat == 4){
+    public int getnextSeat(int seat) {
+        if (seat == 4) {
             seat = 1;
-        }else {
+        } else {
             seat++;
         }
         return seat;
@@ -480,40 +475,41 @@ public class GameData {
         this.claim_color = claim_color;
     }
 
-    public int getChalof(int seatNo){
-        if (seatNo == 1){
+    public int getChalof(int seatNo) {
+        if (seatNo == 1) {
             return chal_card_1;
-        }else if(seatNo == 2){
+        } else if (seatNo == 2) {
             return chal_card_2;
-        }else if(seatNo == 3){
+        } else if (seatNo == 3) {
             return chal_card_3;
-        }else if(seatNo == 4){
+        } else if (seatNo == 4) {
             return chal_card_4;
-        }else {
+        } else {
             return 0;
         }
     }
 
-    public void setChalof(int seatNo, int chal_data){
-        if (seatNo == 1){
+    public void setChalof(int seatNo, int chal_data) {
+        if (seatNo == 1) {
             this.chal_card_1 = chal_data;
-        }else if(seatNo == 2){
+        } else if (seatNo == 2) {
             this.chal_card_2 = chal_data;
-        }else if(seatNo == 3){
+        } else if (seatNo == 3) {
             this.chal_card_3 = chal_data;
-        }else if(seatNo == 4){
+        } else if (seatNo == 4) {
             this.chal_card_4 = chal_data;
         }
     }
 
-    public void incScoreA(){
+    public void incScoreA() {
         this.scoreA++;
     }
-    public void incScoreB(){
+
+    public void incScoreB() {
         this.scoreB++;
     }
 
-    public void calculate_chal_result(){
+    public void calculate_chal_result() {
 
 
         Card[] th_cards = new Card[4];
@@ -524,48 +520,41 @@ public class GameData {
         th_cards[2] = new Card(this.getChal_card_3());
         th_cards[3] = new Card(this.getChal_card_4());
 
-        if(th_cards[0].getColor() == th_cards[1].getColor() &&
+        if (th_cards[0].getColor() == th_cards[1].getColor() &&
                 th_cards[0].getColor() == th_cards[2].getColor() &&
-                th_cards[0].getColor() == th_cards[3].getColor() )
-        {
+                th_cards[0].getColor() == th_cards[3].getColor()) {
             int maxValue = th_cards[0].getRank();
             index = 0;
-            for(int a = 0; a < th_cards.length; a++)
-            {
-                if(maxValue < th_cards[a].getRank())
-                {
+            for (int a = 0; a < th_cards.length; a++) {
+                if (maxValue < th_cards[a].getRank()) {
                     maxValue = th_cards[a].getRank();
                     index = a;
                 }
             }
-        }else if(th_cards[0].getColor() == this.getClaim_color() ||
+        } else if (th_cards[0].getColor() == this.getClaim_color() ||
                 th_cards[1].getColor() == this.getClaim_color() ||
                 th_cards[2].getColor() == this.getClaim_color() ||
-                th_cards[3].getColor() == this.getClaim_color() ){
+                th_cards[3].getColor() == this.getClaim_color()) {
 
             int maxValue = 0;
             index = 0;
 
-            for(int a = 0; a < th_cards.length; a++)
-            {
+            for (int a = 0; a < th_cards.length; a++) {
                 if (th_cards[a].getColor() == this.getClaim_color()) {
-                    if(maxValue < th_cards[a].getRank())
-                    {
+                    if (maxValue < th_cards[a].getRank()) {
                         maxValue = th_cards[a].getRank();
                         index = a;
                     }
                 }
             }
-        }else {
+        } else {
 
             int maxValue = th_cards[0].getRank();
             index = 0;
 
-            for(int a = 1; a < th_cards.length; a++)
-            {
+            for (int a = 1; a < th_cards.length; a++) {
                 if (th_cards[a].getColor() == th_cards[0].getColor()) {
-                    if(maxValue < th_cards[a].getRank())
-                    {
+                    if (maxValue < th_cards[a].getRank()) {
                         maxValue = th_cards[a].getRank();
                         index = a;
                     }
@@ -574,18 +563,17 @@ public class GameData {
         }
 
         int i;
-        for(i=0; i< index; i++){
+        for (i = 0; i < index; i++) {
             this.chal_seat = getnextSeat(this.chal_seat);
         }
-        if(this.chal_seat == 1 || this.chal_seat == 3){
+        if (this.chal_seat == 1 || this.chal_seat == 3) {
             this.feesA++;
-        }else {
+        } else {
             this.feesB++;
         }
 
         this.chal_round++;
         this.chal_number = 1;
-
 
 
     }
@@ -604,5 +592,85 @@ public class GameData {
 
     public void setFeesB(int feesB) {
         this.feesB = feesB;
+    }
+
+    public void setThrowncardindeck(int seat, int position) {
+        String temp = this.getDeck();
+        StringBuilder stringBuilder = new StringBuilder(temp);
+        stringBuilder.replace(((seat - 1) * 26) + ((position - 1) * 2), ((seat - 1) * 26) + ((position - 1) * 2) + 2, "00"); //ok
+        this.deck = stringBuilder.toString();
+    }
+
+    public void setThrowncardindeck(int rank) {
+        String temp = this.getDeck();
+        StringBuilder stringBuilder = new StringBuilder(temp);
+        int cardNum = 0;
+        for (int i = 0; i <= 103; i += 2) {
+            cardNum = Integer.parseInt(temp.substring(i, i + 2));
+            if (cardNum == rank) {
+                stringBuilder.replace(i, i + 2, "00");
+                this.setDeck(stringBuilder.toString());
+                break;
+            }
+        }
+    }
+
+    public void initiateDeck(){
+        Deck deck = new Deck();
+        deck.shuffle(100);
+        this.setDeck(deck.toString());
+    }
+
+    public void sortplayercards(){
+        Deck deck;
+        Card[] myCards;
+        for (int sno = 1; sno <= 4 ;sno++){
+            deck = new Deck(this.getDeck());
+            myCards = deck.getCards(((sno - 1) * 13), sno * 13 - 1);
+
+            for (int i = 0; i <= 12; i++) {
+                for (int j = 0; j < 12 - i; j++) {
+                    if (myCards[j].getCardNo() < myCards[j + 1].getCardNo()) {
+                        Card tmp = myCards[j];
+                        myCards[j] = myCards[j + 1];
+                        myCards[j + 1] = tmp;
+                    }
+                }
+            }
+
+            String temp = new String();
+            for (int i = 0; i <= 12; i++) {
+                temp = myCards[i].toString() + temp;
+            }
+
+            String tmp2 = new String();
+             switch (sno) {
+                case 1:
+                    tmp2 = temp + this.getDeck().substring(26);
+                    this.setDeck(tmp2);
+                    break;
+                case 2:
+                    tmp2 = this.getDeck().substring(0, 26) + temp + this.getDeck().substring(52);
+                    this.setDeck(tmp2);
+                    break;
+                case 3:
+                    tmp2 = this.getDeck().substring(0, 52) + temp + this.getDeck().substring(78);
+                    this.setDeck(tmp2);
+                    break;
+                case 4:
+                    tmp2 = this.getDeck().substring(0, 78) + temp;
+                    this.setDeck(tmp2);
+                    break;
+            }
+
+        }
+    }
+
+    public Card[] getMycards(int seat){
+
+        Card[] myCards;
+        Deck deck = new Deck(this.getDeck());
+        myCards = deck.getCards(((seat - 1) * 13), seat * 13 - 1);
+        return myCards;
     }
 }

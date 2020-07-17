@@ -287,17 +287,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 switch (gameData.getState()) {
                     case GameData.IDEAL:
 
-//                        if(gameData.getId2().equals("COMPUTER1")){
-//                            gameData.setChal_card_2(25);
-//                        }
-//                        if(gameData.getId3().equals("COMPUTER2")){
-//                            gameData.setChal_card_3(25);
-//                        }
-//                        if(gameData.getId4().equals("COMPUTER3")){
-//                            gameData.setChal_card_4(25);
-//                        }
-
-
                         if (gameData.getChal_card_1() == 25 &&
                                 gameData.getChal_card_2() == 25 &&
                                 gameData.getChal_card_3() == 25 &&
@@ -393,9 +382,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                         } else {
 
                             if (gameData.getPlayerIDAtSeat(gameData.getShufflingSeat()).contains("COMPUTER") && mySeatNo == 1) {
-                                deck = new Deck();
-                                deck.shuffle(100);
-                                gameData.setDeck(deck.toString());
+                                gameData.initiateDeck();
+                                gameData.sortplayercards();
                                 gameData.setState(GameData.COLLECT_CARDS);
                                 reference2.setValue(gameData);
 
@@ -405,67 +393,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                         break;
 
                     case GameData.COLLECT_CARDS:
-                        deck = new Deck(gameData.getDeck());
-                        myCards = deck.getCards(((mySeatNo - 1) * 13), mySeatNo * 13 - 1);
 
                         btn_Shuffle.setVisibility(View.INVISIBLE);
                         im_deck_shuffle.setVisibility(View.INVISIBLE);
 
-                        for (int i = 0; i <= 12; i++) {
-                            for (int j = 0; j < 12 - i; j++) {
-                                if (myCards[j].getCardNo() < myCards[j + 1].getCardNo()) {
-                                    Card tmp = myCards[j];
-                                    myCards[j] = myCards[j + 1];
-                                    myCards[j + 1] = tmp;
-                                }
-                            }
-                        }
-
-                        if (mySeatNo == 1) {
-                            for (int in = 1; in <= 4; in++) {
-                                    //Sort computer cards
-                                    deck = new Deck(gameData.getDeck());
-                                    myCards = deck.getCards(((in - 1) * 13), in * 13 - 1);
-
-                                    for (int i = 0; i <= 12; i++) {
-                                        for (int j = 0; j < 12 - i; j++) {
-                                            if (myCards[j].getCardNo() < myCards[j + 1].getCardNo()) {
-                                                Card tmp = myCards[j];
-                                                myCards[j] = myCards[j + 1];
-                                                myCards[j + 1] = tmp;
-                                            }
-                                        }
-                                    }
-
-                                String temp = new String();
-                                for (int i = 0; i <= 12; i++) {
-                                    temp = myCards[i].toString() + temp;
-                                }
-
-
-                                String tmp2 = new String();
-                                switch (in) {
-                                    case 1:
-                                        tmp2 = temp + gameData.getDeck().substring(26);
-                                        gameData.setDeck(tmp2);
-                                        break;
-                                    case 2:
-                                        tmp2 = gameData.getDeck().substring(0, 26) + temp + gameData.getDeck().substring(52);
-                                        gameData.setDeck(tmp2);
-                                        break;
-                                    case 3:
-                                        tmp2 = gameData.getDeck().substring(0, 52) + temp + gameData.getDeck().substring(78);
-                                        gameData.setDeck(tmp2);
-                                        break;
-                                    case 4:
-                                        tmp2 = gameData.getDeck().substring(0, 78) + temp;
-                                        gameData.setDeck(tmp2);
-                                        break;
-                                }
-                            }
-                        }
-
                         message.setText("");
+
+                        myCards = gameData.getMycards(mySeatNo);
 
                         for (int i = 0; i <= 12; i++) {
                             cardsIV[i].setVisibility(View.VISIBLE);
@@ -476,7 +410,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                         if (mySeatNo == gameData.getShufflingSeat()) {
                             gameData.setClaim_seat(gameData.getnextSeat(gameData.getShufflingSeat()));
                             gameData.setClaim_number(1);
-
                             gameData.setState(GameData.CLAIM);
                             reference2.setValue(gameData);
                         } else if (onResumet) {
@@ -544,29 +477,29 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                         keypad[6] = popupView.findViewById(R.id.btn_pass);
 
 
-                                        String temp = new String();
-                                        for (int i = 0; i <= 12; i++) {
-                                            temp = myCards[i].toString() + temp;
-                                        }
-                                        String tmp2 = new String();
-                                        switch (mySeatNo) {
-                                            case 1:
-                                                tmp2 = temp + gameData.getDeck().substring(26);
-                                                gameData.setDeck(tmp2);
-                                                break;
-                                            case 2:
-                                                tmp2 = gameData.getDeck().substring(0, 26) + temp + gameData.getDeck().substring(52);
-                                                gameData.setDeck(tmp2);
-                                                break;
-                                            case 3:
-                                                tmp2 = gameData.getDeck().substring(0, 52) + temp + gameData.getDeck().substring(78);
-                                                gameData.setDeck(tmp2);
-                                                break;
-                                            case 4:
-                                                tmp2 = gameData.getDeck().substring(0, 78) + temp;
-                                                gameData.setDeck(tmp2);
-                                                break;
-                                        }
+//                                        String temp = new String();
+//                                        for (int i = 0; i <= 12; i++) {
+//                                            temp = myCards[i].toString() + temp;
+//                                        }
+//                                        String tmp2 = new String();
+//                                        switch (mySeatNo) {
+//                                            case 1:
+//                                                tmp2 = temp + gameData.getDeck().substring(26);
+//                                                gameData.setDeck(tmp2);
+//                                                break;
+//                                            case 2:
+//                                                tmp2 = gameData.getDeck().substring(0, 26) + temp + gameData.getDeck().substring(52);
+//                                                gameData.setDeck(tmp2);
+//                                                break;
+//                                            case 3:
+//                                                tmp2 = gameData.getDeck().substring(0, 52) + temp + gameData.getDeck().substring(78);
+//                                                gameData.setDeck(tmp2);
+//                                                break;
+//                                            case 4:
+//                                                tmp2 = gameData.getDeck().substring(0, 78) + temp;
+//                                                gameData.setDeck(tmp2);
+//                                                break;
+//                                        }
 
                                         for (int i = 0; i <= 6; i++) {
                                             keypad[i].setOnClickListener(GameActivity.this);
@@ -886,48 +819,52 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                         if (gameData.getClaim_seat() == mySeatNo) {
 
                             message.setText("Please Select the Color");
-                            LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-                            final View popupView2 = inflater.inflate(R.layout.popup_color, null);
 
-                            DisplayMetrics dm = new DisplayMetrics();
-                            getWindowManager().getDefaultDisplay().getMetrics(dm);
 
-                            final int width = dm.widthPixels;
-                            final int height = dm.heightPixels;
-                            boolean focusable = true;
-                            popupWindow = new PopupWindow(popupView2, (int) (width * 0.56), (int) (height * 0.3), focusable);
+                            {
+                                LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+                                final View popupView2 = inflater.inflate(R.layout.popup_color, null);
 
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                popupWindow.setElevation(20);
-                            }
+                                DisplayMetrics dm = new DisplayMetrics();
+                                getWindowManager().getDefaultDisplay().getMetrics(dm);
 
-                            findViewById(R.id.game_layout).post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    popupWindow.showAtLocation(findViewById(R.id.game_layout), Gravity.CENTER, 0, 0);
+                                final int width = dm.widthPixels;
+                                final int height = dm.heightPixels;
+                                boolean focusable = true;
+                                popupWindow = new PopupWindow(popupView2, (int) (width * 0.56), (int) (height * 0.3), focusable);
+
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                    popupWindow.setElevation(20);
                                 }
-                            });
 
-                            popupWindow.setTouchInterceptor(new View.OnTouchListener() {
-                                @Override
-                                public boolean onTouch(View v, MotionEvent motionEvent) {
-                                    if (motionEvent.getX() < 0 || motionEvent.getX() > (int) (width * 0.46))
-                                        return true;
-                                    if (motionEvent.getY() < 0 || motionEvent.getY() > (int) (height * 0.3))
-                                        return true;
-                                    return false;
+                                findViewById(R.id.game_layout).post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        popupWindow.showAtLocation(findViewById(R.id.game_layout), Gravity.CENTER, 0, 0);
+                                    }
+                                });
+
+                                popupWindow.setTouchInterceptor(new View.OnTouchListener() {
+                                    @Override
+                                    public boolean onTouch(View v, MotionEvent motionEvent) {
+                                        if (motionEvent.getX() < 0 || motionEvent.getX() > (int) (width * 0.46))
+                                            return true;
+                                        if (motionEvent.getY() < 0 || motionEvent.getY() > (int) (height * 0.3))
+                                            return true;
+                                        return false;
+                                    }
+                                });
+
+                                Button keypad[] = new Button[4];
+                                keypad[0] = popupView2.findViewById(R.id.btn_spades);
+                                keypad[1] = popupView2.findViewById(R.id.btn_club);
+                                keypad[2] = popupView2.findViewById(R.id.btn_diamond);
+                                keypad[3] = popupView2.findViewById(R.id.btn_heart);
+
+                                for (int i = 0; i <= 3; i++) {
+                                    keypad[i].setOnClickListener(GameActivity.this);
                                 }
-                            });
-
-                            Button keypad[] = new Button[4];
-                            keypad[0] = popupView2.findViewById(R.id.btn_spades);
-                            keypad[1] = popupView2.findViewById(R.id.btn_club);
-                            keypad[2] = popupView2.findViewById(R.id.btn_diamond);
-                            keypad[3] = popupView2.findViewById(R.id.btn_heart);
-
-                            for (int i = 0; i <= 3; i++) {
-                                keypad[i].setOnClickListener(GameActivity.this);
-                            }
+                            } //Setting up popup window
 
 
                         } else {
@@ -1004,56 +941,60 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                     gameData.getChalof(3) == 25 &&
                                     gameData.getChalof(4) == 25) {
 
-                                LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-                                final View popupView3 = inflater.inflate(R.layout.popup_claim_ready, null);
+                                final View popupView3;
+                                {
+                                    LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+                                    popupView3 = inflater.inflate(R.layout.popup_claim_ready, null);
 
-                                DisplayMetrics dm = new DisplayMetrics();
-                                getWindowManager().getDefaultDisplay().getMetrics(dm);
+                                    DisplayMetrics dm = new DisplayMetrics();
+                                    getWindowManager().getDefaultDisplay().getMetrics(dm);
 
-                                int width = dm.widthPixels;
-                                int height = dm.heightPixels;
-                                boolean focusable = true;
-                                popupWindow2 = new PopupWindow(popupView3, (int) (width * 0.46), (int) (height * 0.3), focusable);
+                                    int width = dm.widthPixels;
+                                    int height = dm.heightPixels;
+                                    boolean focusable = true;
+                                    popupWindow2 = new PopupWindow(popupView3, (int) (width * 0.46), (int) (height * 0.3), focusable);
 
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                    popupWindow2.setElevation(20);
-                                }
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                        popupWindow2.setElevation(20);
+                                    }
 
-                                TextView tv_claim_player = popupView3.findViewById(R.id.text_claim_player_name);
-                                ImageView iv_claim = popupView3.findViewById(R.id.iv_claim_color);
-                                TextView tv_claim_num = popupView3.findViewById(R.id.text_claim_num);
+                                    TextView tv_claim_player = popupView3.findViewById(R.id.text_claim_player_name);
+                                    ImageView iv_claim = popupView3.findViewById(R.id.iv_claim_color);
+                                    TextView tv_claim_num = popupView3.findViewById(R.id.text_claim_num);
 
-                                tv_claim_player.setText(gameData.getPlayerAtSeat(gameData.getClaim_seat()));
-                                switch (gameData.getClaim_color()) {
-                                    case 1:
-                                        iv_claim.setImageResource(R.drawable.nw_01);
-                                        img_color.setImageResource(R.drawable.nw_01);
-                                        break;
-                                    case 2:
-                                        iv_claim.setImageResource(R.drawable.nw_04);
-                                        img_color.setImageResource(R.drawable.nw_04);
-                                        break;
-                                    case 3:
-                                        iv_claim.setImageResource(R.drawable.nw_03);
-                                        img_color.setImageResource(R.drawable.nw_03);
-                                        break;
-                                    case 4:
-                                        iv_claim.setImageResource(R.drawable.nw_02);
-                                        img_color.setImageResource(R.drawable.nw_02);
-                                        break;
-                                }
-                                tv_claim_num.setText(String.format("%02d", gameData.getClaim_number()));
-                                claim_u1.setText(String.format("%02d", gameData.getClaim_number()));
-                                claim_u1.setVisibility(View.VISIBLE);
+                                    tv_claim_player.setText(gameData.getPlayerAtSeat(gameData.getClaim_seat()));
+                                    switch (gameData.getClaim_color()) {
+                                        case 1:
+                                            iv_claim.setImageResource(R.drawable.nw_01);
+                                            img_color.setImageResource(R.drawable.nw_01);
+                                            break;
+                                        case 2:
+                                            iv_claim.setImageResource(R.drawable.nw_04);
+                                            img_color.setImageResource(R.drawable.nw_04);
+                                            break;
+                                        case 3:
+                                            iv_claim.setImageResource(R.drawable.nw_03);
+                                            img_color.setImageResource(R.drawable.nw_03);
+                                            break;
+                                        case 4:
+                                            iv_claim.setImageResource(R.drawable.nw_02);
+                                            img_color.setImageResource(R.drawable.nw_02);
+                                            break;
+                                    }
+                                    tv_claim_num.setText(String.format("%02d", gameData.getClaim_number()));
+                                    claim_u1.setText(String.format("%02d", gameData.getClaim_number()));
+                                    claim_u1.setVisibility(View.VISIBLE);
 //                                tv_claim.setText(String.format("%02d",gameData.getClaim_number()));
 
 
-                                findViewById(R.id.game_layout).post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        popupWindow2.showAtLocation(findViewById(R.id.game_layout), Gravity.CENTER, 0, 0);
-                                    }
-                                });
+                                    findViewById(R.id.game_layout).post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            popupWindow2.showAtLocation(findViewById(R.id.game_layout), Gravity.CENTER, 0, 0);
+                                        }
+                                    });
+                                } // Setting up popup
+
                                 gameData.setChal_seat(mySeatNo);
                                 gameData.setState(GameData.CHAL_1);
                                 Button start = popupView3.findViewById(R.id.btn_start);
@@ -1066,6 +1007,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                             if (gameData.getChalof(mySeatNo) != 25) {
                                 if (latch) {
                                     latch = false;
+
                                     LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
                                     final View popupView3 = inflater.inflate(R.layout.popup_claim_ready, null);
                                     DisplayMetrics dm = new DisplayMetrics();
@@ -1218,9 +1160,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
                             if (gameData.getPlayerIDAtSeat(gameData.getChal_seat()).contains("COMPUTER") && mySeatNo == 1) {
                                 int cardPlayed = pc1.chalProcess(0, 0, 0, gameData.getChal_seat(), gameData.getClaim_color(), gameData.getDeck());
+                                updateDeckStringForPC(cardPlayed);
                                 gameData.setNextChalCard(cardPlayed);
                                 gameData.setNextChalData();
-                                updateDeckStringForPC(cardPlayed);
+
 
                                 final Handler handler = new Handler();
                                 handler.postDelayed(new Runnable() {
@@ -1266,9 +1209,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
                             if (gameData.getPlayerIDAtSeat(gameData.getChal_seat()).contains("COMPUTER") && mySeatNo == 1) {
                                 int cardPlayed = pc1.chalProcess(gameData.getChal_card_1(), 0, 0, gameData.getChal_seat(), gameData.getClaim_color(), gameData.getDeck());
+                                updateDeckStringForPC(cardPlayed);
                                 gameData.setNextChalCard(cardPlayed);
                                 gameData.setNextChalData();
-                                updateDeckStringForPC(cardPlayed);
+
 
                                 final Handler handler = new Handler();
                                 handler.postDelayed(new Runnable() {
@@ -1315,9 +1259,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
                             if (gameData.getPlayerIDAtSeat(gameData.getChal_seat()).contains("COMPUTER") && mySeatNo == 1) {
                                 int cardPlayed = pc1.chalProcess(gameData.getChal_card_2(), gameData.getChal_card_1(), 0, gameData.getChal_seat(), gameData.getClaim_color(), gameData.getDeck());
+                                updateDeckStringForPC(cardPlayed);
                                 gameData.setNextChalCard(cardPlayed);
                                 gameData.setNextChalData();
-                                updateDeckStringForPC(cardPlayed);
+
 
                                 final Handler handler = new Handler();
                                 handler.postDelayed(new Runnable() {
@@ -1363,9 +1308,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
                             if (gameData.getPlayerIDAtSeat(gameData.getChal_seat()).contains("COMPUTER") && mySeatNo == 1) {
                                 int cardPlayed = pc1.chalProcess(gameData.getChal_card_3(), gameData.getChal_card_2(), gameData.getChal_card_1(), gameData.getChal_seat(), gameData.getClaim_color(), gameData.getDeck());
+                                updateDeckStringForPC(cardPlayed);
                                 gameData.setNextChalCard(cardPlayed);
                                 gameData.setNextChalData();
-                                updateDeckStringForPC(cardPlayed);
+
 
                                 final Handler handler = new Handler();
                                 handler.postDelayed(new Runnable() {
@@ -1526,14 +1472,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 if (btn_Shuffle.getText().toString().equals("Press to Shuffle")) {
                     //  btn_Shuffle.setEnabled(false);
                     btn_Shuffle.setText("Please Wait..");
-                    deck.shuffle(100);
+                    gameData.initiateDeck();
+                    gameData.sortplayercards();
                     btn_Shuffle.setText("Press to Distribute");
                     btn_Shuffle.setEnabled(true);
                 } else if (btn_Shuffle.getText().toString().equals("Press to Distribute")) {
                     //   btn_Shuffle.setEnabled(false);
                     //   btn_Shuffle.setText("Please Wait..");
-
-                    gameData.setDeck(deck.toString());
                     gameData.setState(GameData.COLLECT_CARDS);
                     reference2.setValue(gameData);
 
@@ -1834,35 +1779,39 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 t_user = 1;
                 deck = new Deck(gameData.getDeck());
                 tempCards = deck.getCards(((t_user - 1) * 13), t_user * 13 - 1);
-                Arrays.sort(tempCards);
+//                Arrays.sort(tempCards);
 
-//                for (int i = 0; i <= 12; i++) {
-//                    for (int j = 0; j < 12 - i; j++) {
-//                        if (tempCards[j].getCardNo() < tempCards[j + 1].getCardNo()) {
-//                            Card tmp = tempCards[j];
-//                            tempCards[j] = tempCards[j + 1];
-//                            tempCards[j + 1] = tmp;
-//                        }
-//                    }
-//                }
                 for (int i = 0; i <= 12; i++) {
-                    t_iv_cards[i].setImageResource(tempCards[i].getRes());
+                    for (int j = 0; j < 12 - i; j++) {
+                        if (tempCards[j].getCardNo() < tempCards[j + 1].getCardNo()) {
+                            Card tmp = tempCards[j];
+                            tempCards[j] = tempCards[j + 1];
+                            tempCards[j + 1] = tmp;
+                        }
+                    }
+                }
+                for (int i = 0; i <= 12; i++) {
+                    if (tempCards[i].getRank() != 0) {
+                        t_iv_cards[i].setImageResource(tempCards[i].getRes());
+                    }else {
+                        t_iv_cards[i].setVisibility(View.INVISIBLE);
+                    }
                 }
                 break;
             case R.id.btn_u2:
                 t_user = 2;
                 deck = new Deck(gameData.getDeck());
                 tempCards = deck.getCards(((t_user - 1) * 13), t_user * 13 - 1);
-                Arrays.sort(tempCards);
-//                for (int i = 0; i <= 12; i++) {
-//                    for (int j = 0; j < 12 - i; j++) {
-//                        if (tempCards[j].getCardNo() < tempCards[j + 1].getCardNo()) {
-//                            Card tmp = tempCards[j];
-//                            tempCards[j] = tempCards[j + 1];
-//                            tempCards[j + 1] = tmp;
-//                        }
-//                    }
-//                }
+//                Arrays.sort(tempCards);
+                for (int i = 0; i <= 12; i++) {
+                    for (int j = 0; j < 12 - i; j++) {
+                        if (tempCards[j].getCardNo() < tempCards[j + 1].getCardNo()) {
+                            Card tmp = tempCards[j];
+                            tempCards[j] = tempCards[j + 1];
+                            tempCards[j + 1] = tmp;
+                        }
+                    }
+                }
                 for (int i = 0; i <= 12; i++) {
                     t_iv_cards[i].setImageResource(tempCards[i].getRes());
                 }
@@ -1871,16 +1820,16 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 t_user = 3;
                 deck = new Deck(gameData.getDeck());
                 tempCards = deck.getCards(((t_user - 1) * 13), t_user * 13 - 1);
-                Arrays.sort(tempCards);
-//                for (int i = 0; i <= 12; i++) {
-//                    for (int j = 0; j < 12 - i; j++) {
-//                        if (tempCards[j].getCardNo() < tempCards[j + 1].getCardNo()) {
-//                            Card tmp = tempCards[j];
-//                            tempCards[j] = tempCards[j + 1];
-//                            tempCards[j + 1] = tmp;
-//                        }
-//                    }
-//                }
+//                Arrays.sort(tempCards);
+                for (int i = 0; i <= 12; i++) {
+                    for (int j = 0; j < 12 - i; j++) {
+                        if (tempCards[j].getCardNo() < tempCards[j + 1].getCardNo()) {
+                            Card tmp = tempCards[j];
+                            tempCards[j] = tempCards[j + 1];
+                            tempCards[j + 1] = tmp;
+                        }
+                    }
+                }
                 for (int i = 0; i <= 12; i++) {
                     t_iv_cards[i].setImageResource(tempCards[i].getRes());
                 }
@@ -1889,16 +1838,16 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 t_user = 4;
                 deck = new Deck(gameData.getDeck());
                 tempCards = deck.getCards(((t_user - 1) * 13), t_user * 13 - 1);
-                Arrays.sort(tempCards);
-//                for (int i = 0; i <= 12; i++) {
-//                    for (int j = 0; j < 12 - i; j++) {
-//                        if (tempCards[j].getCardNo() < tempCards[j + 1].getCardNo()) {
-//                            Card tmp = tempCards[j];
-//                            tempCards[j] = tempCards[j + 1];
-//                            tempCards[j + 1] = tmp;
-//                        }
-//                    }
-//                }
+//                Arrays.sort(tempCards);
+                for (int i = 0; i <= 12; i++) {
+                    for (int j = 0; j < 12 - i; j++) {
+                        if (tempCards[j].getCardNo() < tempCards[j + 1].getCardNo()) {
+                            Card tmp = tempCards[j];
+                            tempCards[j] = tempCards[j + 1];
+                            tempCards[j + 1] = tmp;
+                        }
+                    }
+                }
                 for (int i = 0; i <= 12; i++) {
                     t_iv_cards[i].setImageResource(tempCards[i].getRes());
                 }
@@ -1988,24 +1937,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void updateDeckString(int position) {
-        String temp = gameData.getDeck();
-        StringBuilder stringBuilder = new StringBuilder(temp);
-        stringBuilder.replace(((mySeatNo - 1) * 26) + ((position - 1) * 2), ((mySeatNo - 1) * 26) + ((position - 1) * 2) + 2, "00");
-        gameData.setDeck(stringBuilder.toString());
+        gameData.setThrowncardindeck(mySeatNo,position);
     }
 
     private void updateDeckStringForPC(int playedCard) {
-        String temp = gameData.getDeck();
-        StringBuilder stringBuilder = new StringBuilder(temp);
-        int cardNum = 0;
-      here:  for (int i = 0; i <= 51; i += 2) {
-            cardNum = Integer.parseInt(temp.substring(i, i + 2));
-            if (cardNum == playedCard) {
-                stringBuilder.replace(i, i + 2, "00");
-                gameData.setDeck(stringBuilder.toString());
-                break here;
-            }
+        gameData.setThrowncardindeck(playedCard);
 
-        }
     }
+
 }

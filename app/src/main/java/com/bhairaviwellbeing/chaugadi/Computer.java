@@ -191,7 +191,9 @@ public class Computer {
             return result;
         }
         int topHighRank = 13;
+        int count = 0;
         while (suits.size() > 0) {
+            count++;
             if (suits.get(0) >= topHighRank) {
                 result++;
                 suits.remove(0);
@@ -200,7 +202,11 @@ public class Computer {
                 topHighRank--;
                 suits.remove(suits.size() - 1);
             }
+            if(count == 4){
+                break;
+            }
         }
+        result+=suits.size();
         return result;
     }
 
@@ -276,6 +282,7 @@ public class Computer {
         String tempCardStr = "";
         int my_cardsStartIndex = ((myCardsPos * 13 * 2) - 13 * 2);
         int my_cardsEndIndex = (myCardsPos * 13 * 2) - 1;
+
         for (int i = 0; i < deckStr.length(); i += 2) {
             tempCardStr = deckStr.substring(i, i + 2);
             if (tempCardStr.equals("00")) {

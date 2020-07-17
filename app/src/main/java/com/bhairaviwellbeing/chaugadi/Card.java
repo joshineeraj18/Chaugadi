@@ -86,10 +86,16 @@ public class Card {
     }
 
     public Card(int num) {
-        num--;
-        this.color = 1+(num/13);
-        this.number = 1+(num%13);
-        this.res = CARD_RES[(this.color-1)*13+this.number-1];
+        if(num != 0) {
+            num--;
+            this.color = 1+(num/13);
+            this.number = 1+(num%13);
+            this.res = CARD_RES[(this.color - 1) * 13 + this.number - 1];
+        }else {
+            this.color = 0;
+            this.number = 0;
+            this.res = num;
+        }
     }
 
     public Card(int color, int number) {
