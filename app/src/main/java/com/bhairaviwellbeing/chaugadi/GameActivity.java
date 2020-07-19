@@ -1208,7 +1208,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
 
                             if (gameData.getPlayerIDAtSeat(gameData.getChal_seat()).contains("COMPUTER") && mySeatNo == 1) {
-                                int cardPlayed = pc1.chalProcess(gameData.getChal_card_1(), 0, 0, gameData.getChal_seat(), gameData.getClaim_color(), gameData.getDeck());
+                                int cardPlayed = pc1.chalProcess(
+                                        gameData.getChal_card_1(),
+                                        0,
+                                        0,
+                                        gameData.getChal_seat(),
+                                        gameData.getClaim_color(),
+                                        gameData.getDeck());
+
                                 updateDeckStringForPC(cardPlayed);
                                 gameData.setNextChalCard(cardPlayed);
                                 gameData.setNextChalData();
@@ -1258,7 +1265,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
 
                             if (gameData.getPlayerIDAtSeat(gameData.getChal_seat()).contains("COMPUTER") && mySeatNo == 1) {
-                                int cardPlayed = pc1.chalProcess(gameData.getChal_card_2(), gameData.getChal_card_1(), 0, gameData.getChal_seat(), gameData.getClaim_color(), gameData.getDeck());
+                                int cardPlayed = pc1.chalProcess(
+                                        gameData.getChal_card_2(),
+                                        gameData.getChal_card_1(),
+                                        0,
+                                        gameData.getChal_seat(),
+                                        gameData.getClaim_color(),
+                                        gameData.getDeck());
                                 updateDeckStringForPC(cardPlayed);
                                 gameData.setNextChalCard(cardPlayed);
                                 gameData.setNextChalData();
@@ -1306,8 +1319,15 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                 cardsIV[i].setClickable(false);
                             }
 
+
                             if (gameData.getPlayerIDAtSeat(gameData.getChal_seat()).contains("COMPUTER") && mySeatNo == 1) {
-                                int cardPlayed = pc1.chalProcess(gameData.getChal_card_3(), gameData.getChal_card_2(), gameData.getChal_card_1(), gameData.getChal_seat(), gameData.getClaim_color(), gameData.getDeck());
+                                int cardPlayed = pc1.chalProcess(
+                                        gameData.getChal_card_3(),
+                                        gameData.getChal_card_2(),
+                                        gameData.getChal_card_1(),
+                                        gameData.getChal_seat(),
+                                        gameData.getClaim_color(),
+                                        gameData.getDeck());
                                 updateDeckStringForPC(cardPlayed);
                                 gameData.setNextChalCard(cardPlayed);
                                 gameData.setNextChalData();
@@ -1928,21 +1948,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         deck = new Deck(gameData.getDeck());
         tempCards = deck.getCards(((t_user - 1) * 13), t_user * 13 - 1);
-
         for (int i = 0; i <= 12; i++) {
             t_iv_cards[i].setImageResource(tempCards[i].getRes());
         }
-
-
     }
-
     private void updateDeckString(int position) {
         gameData.setThrowncardindeck(mySeatNo,position);
     }
-
     private void updateDeckStringForPC(int playedCard) {
         gameData.setThrowncardindeck(playedCard);
-
     }
-
 }

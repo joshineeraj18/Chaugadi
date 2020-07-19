@@ -280,6 +280,7 @@ public class Computer {
         List<Integer> my_cardsList = new ArrayList<Integer>();
         List<Integer> unseen_cardsList = new ArrayList<Integer>();
         String tempCardStr = "";
+
         int my_cardsStartIndex = ((myCardsPos * 13 * 2) - 13 * 2);
         int my_cardsEndIndex = (myCardsPos * 13 * 2) - 1;
 
@@ -535,7 +536,7 @@ public class Computer {
         } else if (card <= 13) {
             result = "Spade";
         } else if (card <= 26) {
-            result = "club";
+            result = "Club";
         } else if (card <= 39) {
             result = "Diamond";
         } else {
