@@ -630,7 +630,7 @@ public class GameData {
 
             for (int i = 0; i <= 12; i++) {
                 for (int j = 0; j < 12 - i; j++) {
-                    if (myCards[j].getCardNo() < myCards[j + 1].getCardNo()) {
+                    if (myCards[j].getCardNo() > myCards[j + 1].getCardNo()) {
                         Card tmp = myCards[j];
                         myCards[j] = myCards[j + 1];
                         myCards[j + 1] = tmp;

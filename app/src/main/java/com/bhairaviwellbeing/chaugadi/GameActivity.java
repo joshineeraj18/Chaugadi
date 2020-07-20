@@ -820,6 +820,22 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
                             message.setText("Please Select the Color");
 
+                            if(mySeatNo == 1){
+                                if (gameData.getId1().contains("COMPUTER")) {
+                                    gameData.setChal_card_1(25);
+                                }
+                                if (gameData.getId2().contains("COMPUTER")) {
+                                    gameData.setChal_card_2(25);
+                                }
+                                if (gameData.getId3().contains("COMPUTER")) {
+                                    gameData.setChal_card_3(25);
+                                }
+                                if (gameData.getId4().contains("COMPUTER")) {
+                                    gameData.setChal_card_4(25);
+                                }
+
+                            }
+
 
                             {
                                 LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
