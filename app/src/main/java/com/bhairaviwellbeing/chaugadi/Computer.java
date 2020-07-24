@@ -426,7 +426,7 @@ public class Computer {
                     } else { //to do
                         if (!isSelectedSuitEmpty(firstChalSuit, spades, clubs, diamonds, hearts)) {
 
-                            tempCard = getSelectedSuitHigherRankCard(firstChalSuit, (oppMaxCardRank > 100) ? oppMaxCardRank - 100 : (oppMaxCardRank < 100) ? oppMaxCardRank + 100 : oppMaxCardRank, spades, clubs, diamonds, hearts);
+                            tempCard = getSelectedSuitHigherRankCard(firstChalSuit, (oppMaxCardRank > 100) ? oppMaxCardRank - 100 : (oppMaxCardRank < 0) ? oppMaxCardRank + 100 : oppMaxCardRank, spades, clubs, diamonds, hearts);
                             if (tempCard != 0) {
                                 return tempCard;
                             } else {
@@ -847,19 +847,36 @@ public class Computer {
 
     public boolean IsThisCardIsHighestCardInUnseenCards(int thisCard, List<Integer> unseenSpades, List<Integer> unseenClubs, List<Integer> unseenDiamonds, List<Integer> unseenHearts) {
         boolean result = false;
+
         if (thisCard <= 13) {
+            if (unseenSpades.isEmpty()) {
+                return true;
+            }
             if (getRankByCard(thisCard) > unseenSpades.get(0)) {
                 return true;
             }
         } else if (thisCard <= 26) {
+            if (unseenClubs.isEmpty()) {
+                return true;
+            }
             if (getRankByCard(thisCard) > unseenClubs.get(0)) {
                 return true;
             }
         } else if (thisCard <= 39) {
+
+            if (unseenDiamonds.isEmpty()) {
+                return true;
+            }
+
             if (getRankByCard(thisCard) > unseenDiamonds.get(0)) {
                 return true;
             }
         } else if (thisCard <= 52) {
+
+            if (unseenHearts.isEmpty()) {
+                return true;
+            }
+
             if (getRankByCard(thisCard) > unseenHearts.get(0)) {
                 return true;
             }
@@ -946,17 +963,17 @@ public class Computer {
         int myRank = 0;
         int tempCard;
         boolean canGoWithLowerCardThanFrndCard = true;
+        boolean isFrndCardIsHighestInUnSeen=IsThisCardIsHighestCardInUnseenCards(frndCard, unseenSpades, unseenClubs, unseenDiamonds, unseenHearts);
+
+
+
         switch (selectedSuit) {
             case "Spade":
                 if (!spades.isEmpty()) {
-                    if (unseenSpades.isEmpty()) {
+                    if (isFrndCardIsHighestInUnSeen) {
                         return spades.get(spades.size() - 1);
                     } else {
-                        if (IsThisCardIsHighestCardInUnseenCards(frndCard, unseenSpades, unseenClubs, unseenDiamonds, unseenHearts)) {
-                            return getSelectedSuitLowestCard(selectedSuit, spades, clubs, diamonds, hearts);
-                        } else {
-                            return getSelectedSuitHighestCardWithUnseenInfo(selectedSuit, spades, clubs, diamonds, hearts, unseenSpades, unseenClubs, unseenDiamonds, unseenHearts);
-                        }
+                        return getSelectedSuitHighestCardWithUnseenInfo(selectedSuit, spades, clubs, diamonds, hearts, unseenSpades, unseenClubs, unseenDiamonds, unseenHearts);
                     }
                 }
 
@@ -979,40 +996,28 @@ public class Computer {
                 break;
             case "Club":
                 if (!clubs.isEmpty()) {
-                    if (unseenClubs.isEmpty()) {
+                    if (isFrndCardIsHighestInUnSeen) {
                         return clubs.get(clubs.size() - 1) + 13;
                     } else {
-                        if (IsThisCardIsHighestCardInUnseenCards(frndCard, unseenSpades, unseenClubs, unseenDiamonds, unseenHearts)) {
-                            return getSelectedSuitLowestCard(selectedSuit, spades, clubs, diamonds, hearts);
-                        } else {
-                            return getSelectedSuitHighestCardWithUnseenInfo(selectedSuit, spades, clubs, diamonds, hearts, unseenSpades, unseenClubs, unseenDiamonds, unseenHearts);
-                        }
+                        return getSelectedSuitHighestCardWithUnseenInfo(selectedSuit, spades, clubs, diamonds, hearts, unseenSpades, unseenClubs, unseenDiamonds, unseenHearts);
                     }
                 }
                 break;
             case "Diamond":
                 if (!diamonds.isEmpty()) {
-                    if (unseenDiamonds.isEmpty()) {
+                    if (isFrndCardIsHighestInUnSeen) {
                         return diamonds.get(diamonds.size() - 1) + 26;
                     } else {
-                        if (IsThisCardIsHighestCardInUnseenCards(frndCard, unseenSpades, unseenClubs, unseenDiamonds, unseenHearts)) {
-                            return getSelectedSuitLowestCard(selectedSuit, spades, clubs, diamonds, hearts);
-                        } else {
-                            return getSelectedSuitHighestCardWithUnseenInfo(selectedSuit, spades, clubs, diamonds, hearts, unseenSpades, unseenClubs, unseenDiamonds, unseenHearts);
-                        }
+                        return getSelectedSuitHighestCardWithUnseenInfo(selectedSuit, spades, clubs, diamonds, hearts, unseenSpades, unseenClubs, unseenDiamonds, unseenHearts);
                     }
                 }
                 break;
             case "Heart":
                 if (!hearts.isEmpty()) {
-                    if (unseenHearts.isEmpty()) {
+                    if (isFrndCardIsHighestInUnSeen) {
                         return hearts.get(hearts.size() - 1) + 39;
                     } else {
-                        if (IsThisCardIsHighestCardInUnseenCards(frndCard, unseenSpades, unseenClubs, unseenDiamonds, unseenHearts)) {
-                            return getSelectedSuitLowestCard(selectedSuit, spades, clubs, diamonds, hearts);
-                        } else {
-                            return getSelectedSuitHighestCardWithUnseenInfo(selectedSuit, spades, clubs, diamonds, hearts, unseenSpades, unseenClubs, unseenDiamonds, unseenHearts);
-                        }
+                        return getSelectedSuitHighestCardWithUnseenInfo(selectedSuit, spades, clubs, diamonds, hearts, unseenSpades, unseenClubs, unseenDiamonds, unseenHearts);
                     }
                 }
                 break;

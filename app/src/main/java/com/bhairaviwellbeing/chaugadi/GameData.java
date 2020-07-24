@@ -32,6 +32,8 @@ public class GameData {
     private int claim_number;
     private int claim_color;
 
+    Boolean isroomActive;
+
 
     private int shufflingSeat;
 
@@ -48,10 +50,20 @@ public class GameData {
     public static final int CLAIM = 8;
     public static final int CLAIM_COLOR = 9;
     public static final int CLAIM_READY = 10;
+    public static final int EXIT = 11;
+
 
 
     private boolean isGameStarted = false;
 
+
+    public Boolean getIsroomActive() {
+        return isroomActive;
+    }
+
+    public void setIsroomActive(Boolean isroomActive) {
+        this.isroomActive = isroomActive;
+    }
 
     public GameData() {
         this.scoreA = 0;
@@ -78,6 +90,7 @@ public class GameData {
         this.claim_color = 0;
         this.feesA = 0;
         this.feesB = 0;
+        this.isroomActive = true;
     }
 
     public int getScoreA() {

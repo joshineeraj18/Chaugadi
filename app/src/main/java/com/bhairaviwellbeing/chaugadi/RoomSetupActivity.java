@@ -9,6 +9,9 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -234,6 +237,19 @@ public class RoomSetupActivity extends AppCompatActivity implements View.OnClick
                         player3.setClickable(true);
                         player4.setClickable(true);
                         seat = 2;
+
+                        TranslateAnimation mAnimation = new TranslateAnimation(
+                                TranslateAnimation.ABSOLUTE, 0f,
+                                TranslateAnimation.ABSOLUTE, 0f,
+                                TranslateAnimation.RELATIVE_TO_PARENT, 0f,
+                                TranslateAnimation.RELATIVE_TO_PARENT, 0.05f);
+
+                        mAnimation.setDuration(300);
+                        mAnimation.setRepeatCount(-1);
+                        mAnimation.setRepeatMode(Animation.REVERSE);
+                        mAnimation.setInterpolator(new LinearInterpolator());
+                        player2_dp.setAnimation(mAnimation);
+
                     }
 
                 }
@@ -385,14 +401,33 @@ public class RoomSetupActivity extends AppCompatActivity implements View.OnClick
     @Override
     public void onClick(View v) {
 
+        player3_dp.clearAnimation();
+        player4_dp.clearAnimation();
+
+
         switch (v.getId()){
 
             case R.id.player_2:
                 if(seat == 2){
                     player2DP.setText(player2_name);
                     player2.setClickable(false);
+
+                    player2_dp.clearAnimation();
                     player3_dp.setVisibility(View.VISIBLE);
+
+                    TranslateAnimation mAnimation = new TranslateAnimation(
+                            TranslateAnimation.ABSOLUTE, 0f,
+                            TranslateAnimation.ABSOLUTE, 0f,
+                            TranslateAnimation.RELATIVE_TO_PARENT, 0f,
+                            TranslateAnimation.RELATIVE_TO_PARENT, 0.05f);
+
+                    mAnimation.setDuration(300);
+                    mAnimation.setRepeatCount(-1);
+                    mAnimation.setRepeatMode(Animation.REVERSE);
+                    mAnimation.setInterpolator(new LinearInterpolator());
+                    player3_dp.setAnimation(mAnimation);
                     seat++;
+
                 }else {if(seat == 3){
                     player2.setClickable(false);
                     player3.setClickable(false);
@@ -400,6 +435,8 @@ public class RoomSetupActivity extends AppCompatActivity implements View.OnClick
 
                     seats[2]=2;
                     player3DP.setText(player2_name);
+                    player3_dp.clearAnimation();
+
                     player4_dp.setVisibility(View.VISIBLE);
 
                     if (seats[1] == 3) {
@@ -423,17 +460,33 @@ public class RoomSetupActivity extends AppCompatActivity implements View.OnClick
                 if(seat == 2){
                     player2DP.setText(player3_name);
                     player3.setClickable(false);
+
+                    player2_dp.clearAnimation();
                     player3_dp.setVisibility(View.VISIBLE);
+
+                    TranslateAnimation mAnimation = new TranslateAnimation(
+                            TranslateAnimation.ABSOLUTE, 0f,
+                            TranslateAnimation.ABSOLUTE, 0f,
+                            TranslateAnimation.RELATIVE_TO_PARENT, 0f,
+                            TranslateAnimation.RELATIVE_TO_PARENT, 0.05f);
+
+                    mAnimation.setDuration(300);
+                    mAnimation.setRepeatCount(-1);
+                    mAnimation.setRepeatMode(Animation.REVERSE);
+                    mAnimation.setInterpolator(new LinearInterpolator());
+                    player3_dp.setAnimation(mAnimation);
                     seat++;
                     seats[1]=3;
                 }else {if(seat == 3){
                     player2.setClickable(false);
                     player3.setClickable(false);
                     player4.setClickable(false);
-
                     seats[2]=3;
                     player3DP.setText(player3_name);
+
+                    player3_dp.clearAnimation();
                     player4_dp.setVisibility(View.VISIBLE);
+
 
                     if (seats[1] == 2) {
                         seats[3]= 4;
@@ -457,7 +510,22 @@ public class RoomSetupActivity extends AppCompatActivity implements View.OnClick
                 if(seat == 2){
                     player2DP.setText(player4_name);
                     player4.setClickable(false);
+                    player2_dp.clearAnimation();
                     player3_dp.setVisibility(View.VISIBLE);
+
+                    TranslateAnimation mAnimation = new TranslateAnimation(
+                            TranslateAnimation.ABSOLUTE, 0f,
+                            TranslateAnimation.ABSOLUTE, 0f,
+                            TranslateAnimation.RELATIVE_TO_PARENT, 0f,
+                            TranslateAnimation.RELATIVE_TO_PARENT, 0.05f);
+
+                    mAnimation.setDuration(300);
+                    mAnimation.setRepeatCount(-1);
+                    mAnimation.setRepeatMode(Animation.REVERSE);
+                    mAnimation.setInterpolator(new LinearInterpolator());
+                    player3_dp.setAnimation(mAnimation);
+
+
                     seat++;
                     seats[1]=4;
                 }else {if(seat == 3){
@@ -586,15 +654,15 @@ public class RoomSetupActivity extends AppCompatActivity implements View.OnClick
             case R.id.add_pc:
 
                 if(gameData.getPlayer2().equals("empty")){
-                    gameData.addPlayer("Com 1","COMPUTER1");
+                    gameData.addPlayer("Com1","COMPUTER1");
                     gameData.setChal_card_2(25);
                     reference2.setValue(gameData);
                 }else if(gameData.getPlayer3().equals("empty")){
-                    gameData.addPlayer("Com 2","COMPUTER2");
+                    gameData.addPlayer("Com2","COMPUTER2");
                     gameData.setChal_card_3(25);
                     reference2.setValue(gameData);
                 }else if(gameData.getPlayer4().equals("empty")){
-                    gameData.addPlayer("Com 3","COMPUTER3");
+                    gameData.addPlayer("Com3","COMPUTER3");
                     gameData.setChal_card_4(25);
                     reference2.setValue(gameData);
                 }else {
