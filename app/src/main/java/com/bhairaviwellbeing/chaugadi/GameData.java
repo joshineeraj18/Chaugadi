@@ -51,6 +51,8 @@ public class GameData {
     public static final int CLAIM_COLOR = 9;
     public static final int CLAIM_READY = 10;
     public static final int EXIT = 11;
+    public static final int GAME_POINT = 12;
+
 
 
 

@@ -1,6 +1,7 @@
 package com.bhairaviwellbeing.chaugadi;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
@@ -28,7 +29,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 public class RoomSetupActivity extends AppCompatActivity implements View.OnClickListener {
@@ -71,6 +77,8 @@ public class RoomSetupActivity extends AppCompatActivity implements View.OnClick
     ValueEventListener ve,ve1,ve2,ve3;
     HashMap<DatabaseReference,ValueEventListener> hashMap;
     MediaPlayer doorsound;
+    List<MediaPlayer> doorsounds;
+
     GameData gameData;
 
 
@@ -148,7 +156,7 @@ public class RoomSetupActivity extends AppCompatActivity implements View.OnClick
         start.setOnClickListener(this);
         add_pc.setOnClickListener(this);
 
-
+        doorsounds = new ArrayList<MediaPlayer>();
 
     }
 
@@ -159,6 +167,7 @@ public class RoomSetupActivity extends AppCompatActivity implements View.OnClick
         room_no = intent.getStringExtra("Room");
         playerno = intent.getStringExtra("Player");
         doorsound = MediaPlayer.create(RoomSetupActivity.this,R.raw.doorclose);
+        doorsounds.add(MediaPlayer.create(RoomSetupActivity.this,R.raw.doorclose));
 
         room_tv.setText("Room\n"+room_no);
 
@@ -207,25 +216,43 @@ public class RoomSetupActivity extends AppCompatActivity implements View.OnClick
 
 
 
-                    if (!player2_name.equals("empty")) {
-                        doorsound.start();
-
+                    if (!player2_name.equals("empty") && player2.getVisibility() == View.INVISIBLE) {
                         player2.setText(player2_name);
                         player2.setVisibility(View.VISIBLE);
+                        doorsounds.add(MediaPlayer.create(RoomSetupActivity.this,R.raw.doorclose));
+                        doorsounds.get(doorsounds.size()-1).start();
+                        doorsounds.get(doorsounds.size()-1).setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                            @Override
+                            public void onCompletion(MediaPlayer mediaPlayer) {
+                                mediaPlayer.release();
+                            }
+                        });
                     }
 
-                    if (!player3_name.equals("empty")) {
-                        doorsound.start();
-
+                    if (!player3_name.equals("empty") &&  player3.getVisibility() == View.INVISIBLE) {
                         player3.setText(player3_name);
                         player3.setVisibility(View.VISIBLE);
+                        doorsounds.add(MediaPlayer.create(RoomSetupActivity.this,R.raw.doorclose));
+                        doorsounds.get(doorsounds.size()-1).start();
+                        doorsounds.get(doorsounds.size()-1).setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                            @Override
+                            public void onCompletion(MediaPlayer mediaPlayer) {
+                                mediaPlayer.release();
+                            }
+                        });
                     }
 
-                    if (!player4_name.equals("empty")) {
-                        doorsound.start();
-
+                    if (!player4_name.equals("empty") &&  player4.getVisibility() == View.INVISIBLE) {
                         player4.setText(player4_name);
                         player4.setVisibility(View.VISIBLE);
+                        doorsounds.add(MediaPlayer.create(RoomSetupActivity.this,R.raw.doorclose));
+                        doorsounds.get(doorsounds.size()-1).start();
+                        doorsounds.get(doorsounds.size()-1).setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                            @Override
+                            public void onCompletion(MediaPlayer mediaPlayer) {
+                                mediaPlayer.release();
+                            }
+                        });
 
                         add_pc.setEnabled(false);
 
@@ -276,31 +303,49 @@ public class RoomSetupActivity extends AppCompatActivity implements View.OnClick
 
 
                     if (!player1_name.equals("empty")) {
-                        doorsound.start();
+
 
                         player1.setText(player1_name);
                         player1.setVisibility(View.VISIBLE);
                     }
 
-                    if (!player2_name.equals("empty")) {
-                        doorsound.start();
-
+                    if (!player2_name.equals("empty") && player2.getVisibility() == View.INVISIBLE) {
                         player2.setText(player2_name);
                         player2.setVisibility(View.VISIBLE);
+                        doorsounds.add(MediaPlayer.create(RoomSetupActivity.this,R.raw.doorclose));
+                        doorsounds.get(doorsounds.size()-1).start();
+                        doorsounds.get(doorsounds.size()-1).setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                            @Override
+                            public void onCompletion(MediaPlayer mediaPlayer) {
+                                mediaPlayer.release();
+                            }
+                        });
                     }
 
-                    if (!player3_name.equals("empty")) {
-                        doorsound.start();
-
+                    if (!player3_name.equals("empty") && player3.getVisibility() == View.INVISIBLE) {
                         player3.setText(player3_name);
                         player3.setVisibility(View.VISIBLE);
+                        doorsounds.add(MediaPlayer.create(RoomSetupActivity.this,R.raw.doorclose));
+                        doorsounds.get(doorsounds.size()-1).start();
+                        doorsounds.get(doorsounds.size()-1).setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                            @Override
+                            public void onCompletion(MediaPlayer mediaPlayer) {
+                                mediaPlayer.release();
+                            }
+                        });
                     }
 
-                    if (!player4_name.equals("empty")) {
-                        doorsound.start();
-
+                    if (!player4_name.equals("empty")&& player3.getVisibility() == View.INVISIBLE) {
                         player4.setText(player4_name);
                         player4.setVisibility(View.VISIBLE);
+                        doorsounds.add(MediaPlayer.create(RoomSetupActivity.this,R.raw.doorclose));
+                        doorsounds.get(doorsounds.size()-1).start();
+                        doorsounds.get(doorsounds.size()-1).setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                            @Override
+                            public void onCompletion(MediaPlayer mediaPlayer) {
+                                mediaPlayer.release();
+                            }
+                        });
                     }
 
 
@@ -386,9 +431,9 @@ public class RoomSetupActivity extends AppCompatActivity implements View.OnClick
         add_pc.setEnabled(true);
         add_pc.setVisibility(View.INVISIBLE);
 
-        player2.setVisibility(View.GONE);
-        player3.setVisibility(View.GONE);
-        player4.setVisibility(View.GONE);
+        player2.setVisibility(View.INVISIBLE);
+        player3.setVisibility(View.INVISIBLE);
+        player4.setVisibility(View.INVISIBLE);
 
         player1.setClickable(false);
         player2.setClickable(false);
@@ -695,6 +740,8 @@ public class RoomSetupActivity extends AppCompatActivity implements View.OnClick
                 doorsound.stop();
             }
             doorsound.release();
+
+
         }catch (Exception e)
         {
             Toast.makeText(RoomSetupActivity.this,"Error:"+e.toString(),Toast.LENGTH_SHORT).show();

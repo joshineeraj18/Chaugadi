@@ -15,6 +15,9 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -129,14 +132,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     public void onClick(DialogInterface dialogInterface, int i) {
 
 
-
                         final DatabaseReference temp = reference2;
 
                         reference2 = null;
 
                         temp.removeEventListener(ve1);
                         reference.child("room").setValue("no-room");
-
 
 
                         if (gameData.getId2().contains("COMPUTER")) {
@@ -223,7 +224,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             im_deck_shuffle.setVisibility(View.GONE);
 
             pc1 = new Computer();
-            score_bar.setOnClickListener(this);
+//            score_bar.setOnClickListener(this);
 
 
             cardsound = MediaPlayer.create(GameActivity.this, R.raw.cardthrow1);
@@ -295,7 +296,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     gameData = dataSnapshot.getValue(GameData.class);
                     mySeatNo = gameData.getMyPosition(user.getUid());
 
-                    if(reference2 == null){
+                    if (reference2 == null) {
                         gameData.setState(GameData.EXIT);
                         return;
                     }
@@ -319,6 +320,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                             } else {
                                 message.setVisibility(View.VISIBLE);
                                 message.setText("Please wait for all to join");
+
                                 if (gameData.getChal_card_1() == 25) {
                                     message.append("\n" + gameData.getPlayerAtSeat(1) + " is in");
                                 }
@@ -1403,141 +1405,159 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                             }
                             break;
                         case GameData.CHAL_RESULT:
-                            cardsound.start();
-                            updateThrownCards();
-                            for (int i = 0; i <= 12; i++) {
-                                cardsIV[i].setClickable(false);
-                            }
 
-                            if (gameData.getPrvSeat(gameData.getChal_seat()) == mySeatNo) {
-
-                                if (gameData.getChal_round() < 13) {
-                                    gameData.calculate_chal_result();
-                                    gameData.setState(GameData.CHAL_1);
-
-
-                                } else {
-                                    gameData.calculate_chal_result();
-
-                                    if (gameData.getClaim_seat() == 1 || gameData.getClaim_seat() == 3) {
-
-                                        if (gameData.getClaim_number() > gameData.getFeesA()) {
-                                            gameData.setScoreA(gameData.getScoreA() - (gameData.getClaim_number() * (gameData.getClaim_number() - gameData.getFeesA() + 1)));
-                                        } else {
-
-                                            gameData.setScoreA(gameData.getScoreA() + gameData.getFeesA());
-
-//                                        gameData.setScoreA(gameData.getScoreA() - gameData.getFeesA());
-//                                        if(gameData.getScoreA() < 0){
-//                                            gameData.setScoreB(0 - gameData.getScoreA());
-//                                            gameData.setScoreA(0);
-//                                        }
-                                        }
-                                    } else {
-
-                                        if (gameData.getClaim_number() > gameData.getFeesB()) {
-                                            gameData.setScoreA(gameData.getScoreA() + (gameData.getClaim_number() * (gameData.getClaim_number() - gameData.getFeesB() + 1)));
-                                        } else {
-                                            gameData.setScoreA(gameData.getScoreA() - gameData.getFeesB());
-
-//                                        gameData.setScoreB(gameData.getScoreB() - gameData.getFeesB());
-//                                        if(gameData.getScoreB() < 0){
-//                                            gameData.setScoreA(0 - gameData.getScoreB());
-//                                            gameData.setScoreB(0);
-//                                        }
-                                        }
+                            if(gameData.getScoreA() > 51 || gameData.getScoreA() < -51){
+                                if(mySeatNo == 1){
+                                    if(gameData.getId2().contains("COMPUTER")){
+                                        gameData.setChal_card_2(25);
+                                    }else {
+                                        gameData.setChal_card_2(0);
                                     }
-
-                                    //Setting Up the Shuffling Seat as per Score
-
-                                    if (gameData.getShufflingSeat() == 1 || gameData.getShufflingSeat() == 3) {
-                                        if (gameData.getScoreA() > 0) {
-                                            gameData.setShufflingSeat(gameData.getnextSeat(gameData.getShufflingSeat()));
-                                        }
-                                    } else {
-                                        if (gameData.getScoreA() < 0) {
-                                            gameData.setShufflingSeat(gameData.getnextSeat(gameData.getShufflingSeat()));
-                                        }
+                                    if(gameData.getId3().contains("COMPUTER")){
+                                        gameData.setChal_card_3(25);
+                                    }else {
+                                        gameData.setChal_card_3(0);
                                     }
-
-                                    gameData.setState(GameData.SHUFFLING);
-
+                                    if(gameData.getId4().contains("COMPUTER")){
+                                        gameData.setChal_card_4(25);
+                                    }else {
+                                        gameData.setChal_card_4(0);
+                                    }
                                 }
-
-                                final Handler handler = new Handler();
-                                handler.postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        // Do something after 5s = 5000ms
-                                        reference2.setValue(gameData);
-                                    }
-                                }, 3000);
-                            } else if (gameData.getPlayerIDAtSeat(gameData.getPrvSeat(gameData.getChal_seat())).contains("COMPUTER")
-                                    && mySeatNo == 1) {
-                                if (gameData.getChal_round() < 13) {
-                                    gameData.calculate_chal_result();
-                                    gameData.setState(GameData.CHAL_1);
-
-                                } else {
-                                    gameData.calculate_chal_result();
-
-                                    if (gameData.getClaim_seat() == 1 || gameData.getClaim_seat() == 3) {
-
-                                        if (gameData.getClaim_number() > gameData.getFeesA()) {
-                                            gameData.setScoreA(gameData.getScoreA() - (gameData.getClaim_number() * (gameData.getClaim_number() - gameData.getFeesA() + 1)));
-                                        } else {
-
-                                            gameData.setScoreA(gameData.getScoreA() + gameData.getFeesA());
-
-//                                        gameData.setScoreA(gameData.getScoreA() - gameData.getFeesA());
-//                                        if(gameData.getScoreA() < 0){
-//                                            gameData.setScoreB(0 - gameData.getScoreA());
-//                                            gameData.setScoreA(0);
-//                                        }
-                                        }
-                                    } else {
-
-                                        if (gameData.getClaim_number() > gameData.getFeesB()) {
-                                            gameData.setScoreA(gameData.getScoreA() + (gameData.getClaim_number() * (gameData.getClaim_number() - gameData.getFeesB() + 1)));
-                                        } else {
-                                            gameData.setScoreA(gameData.getScoreA() - gameData.getFeesB());
-
-//                                        gameData.setScoreB(gameData.getScoreB() - gameData.getFeesB());
-//                                        if(gameData.getScoreB() < 0){
-//                                            gameData.setScoreA(0 - gameData.getScoreB());
-//                                            gameData.setScoreB(0);
-//                                        }
-                                        }
-                                    }
-
-                                    if (gameData.getShufflingSeat() == 1 || gameData.getShufflingSeat() == 3) {
-                                        if (gameData.getScoreA() > 0) {
-                                            gameData.setShufflingSeat(gameData.getnextSeat(gameData.getShufflingSeat()));
-                                        }
-                                    } else {
-                                        if (gameData.getScoreA() < 0) {
-                                            gameData.setShufflingSeat(gameData.getnextSeat(gameData.getShufflingSeat()));
-                                        }
-                                    }
-                                    gameData.setState(GameData.SHUFFLING);
-
+                                gameData.setState(GameData.GAME_POINT);
+                                latch = true;
+                                reference2.setValue(gameData);
+                            }else {
+                                cardsound.start();
+                                updateThrownCards();
+                                for (int i = 0; i <= 12; i++) {
+                                    cardsIV[i].setClickable(false);
                                 }
+                                if (gameData.getPrvSeat(gameData.getChal_seat()) == mySeatNo) {
 
-                                final Handler handler = new Handler();
-                                handler.postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        // Do something after 5s = 5000ms
-                                        reference2.setValue(gameData);
+                                    if (gameData.getChal_round() < 13) {
+                                        gameData.calculate_chal_result();
+                                        gameData.setState(GameData.CHAL_1);
+                                    } else {
+                                        gameData.calculate_chal_result();
+
+                                        if (gameData.getClaim_seat() == 1 || gameData.getClaim_seat() == 3) {
+
+                                            if (gameData.getClaim_number() > gameData.getFeesA()) {
+                                                gameData.setScoreA(gameData.getScoreA() - (gameData.getClaim_number() * (gameData.getClaim_number() - gameData.getFeesA() + 1)));
+                                            } else {
+                                                gameData.setScoreA(gameData.getScoreA() + gameData.getFeesA());
+                                            }
+                                        } else {
+
+                                            if (gameData.getClaim_number() > gameData.getFeesB()) {
+                                                gameData.setScoreA(gameData.getScoreA() + (gameData.getClaim_number() * (gameData.getClaim_number() - gameData.getFeesB() + 1)));
+                                            } else {
+                                                gameData.setScoreA(gameData.getScoreA() - gameData.getFeesB());
+                                            }
+                                        }
+
+                                        //Setting Up the Shuffling Seat as per Score
+
+                                        if (gameData.getShufflingSeat() == 1 || gameData.getShufflingSeat() == 3) {
+                                            if (gameData.getScoreA() > 0) {
+                                                gameData.setShufflingSeat(gameData.getnextSeat(gameData.getShufflingSeat()));
+                                            }
+                                        } else {
+                                            if (gameData.getScoreA() < 0) {
+                                                gameData.setShufflingSeat(gameData.getnextSeat(gameData.getShufflingSeat()));
+                                            }
+                                        }
+
+                                            gameData.setState(GameData.CHAL_RESULT);
+
                                     }
-                                }, 3000);
+
+                                    final Handler handler = new Handler();
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            // Do something after 5s = 5000ms
+                                            reference2.setValue(gameData);
+                                        }
+                                    }, 3000);
+                                } else if (gameData.getPlayerIDAtSeat(gameData.getPrvSeat(gameData.getChal_seat())).contains("COMPUTER")
+                                        && mySeatNo == 1) {
+                                    if (gameData.getChal_round() < 13) {
+                                        gameData.calculate_chal_result();
+                                        gameData.setState(GameData.CHAL_1);
+
+                                    } else {
+                                        gameData.calculate_chal_result();
+
+                                        if (gameData.getClaim_seat() == 1 || gameData.getClaim_seat() == 3) {
+
+                                            if (gameData.getClaim_number() > gameData.getFeesA()) {
+                                                gameData.setScoreA(gameData.getScoreA() - (gameData.getClaim_number() * (gameData.getClaim_number() - gameData.getFeesA() + 1)));
+                                            } else {
+                                                gameData.setScoreA(gameData.getScoreA() + gameData.getFeesA());
+                                            }
+                                        } else {
+
+                                            if (gameData.getClaim_number() > gameData.getFeesB()) {
+                                                gameData.setScoreA(gameData.getScoreA() + (gameData.getClaim_number() * (gameData.getClaim_number() - gameData.getFeesB() + 1)));
+                                            } else {
+                                                gameData.setScoreA(gameData.getScoreA() - gameData.getFeesB());
+                                            }
+                                        }
+
+                                        if (gameData.getShufflingSeat() == 1 || gameData.getShufflingSeat() == 3) {
+                                            if (gameData.getScoreA() > 0) {
+                                                gameData.setShufflingSeat(gameData.getnextSeat(gameData.getShufflingSeat()));
+                                            }
+                                        } else {
+                                            if (gameData.getScoreA() < 0) {
+                                                gameData.setShufflingSeat(gameData.getnextSeat(gameData.getShufflingSeat()));
+                                            }
+                                        }
+
+                                        gameData.setState(GameData.SHUFFLING);
+
+
+                                    }
+
+                                    final Handler handler = new Handler();
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            // Do something after 5s = 5000ms
+                                            reference2.setValue(gameData);
+                                        }
+                                    }, 3000);
+                                }
                             }
 
                             break;
 
-                            case GameData.EXIT:
-                                message.setText("Bye... Bye...");
-                                break;
+                        case GameData.EXIT:
+                            message.setText("Bye... Bye...");
+                            break;
+
+                        case GameData.GAME_POINT:
+                            if (latch) {
+                                latch = false;
+                                if(gameData.getScoreA()< -51){
+                                    if(mySeatNo == 1 || mySeatNo == 3){
+                                        popupforCongratulate(false);
+                                    }else {
+                                        popupforCongratulate(true);
+                                    }
+                                }else {
+                                    if(mySeatNo == 1 || mySeatNo == 3){
+                                        popupforCongratulate(true);
+                                    }else {
+                                        popupforCongratulate(false);
+                                    }
+
+                                }
+                            }
+                            break;
+
                     }
                 }
 
@@ -1571,8 +1591,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
                 }
             });
-        }catch (Exception e){
-            Toast.makeText(getApplicationContext(),"Room is deleted",Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(getApplicationContext(), "Room is deleted", Toast.LENGTH_SHORT).show();
 
         }
     }
@@ -1585,6 +1605,64 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         }
         thrown_cards[tSeat].setImageResource(gameData.getLastThrownCard().getRes());
         thrown_cards[tSeat].setVisibility(View.VISIBLE);
+
+        if (tSeat == 0) {
+            TranslateAnimation mAnimation = new TranslateAnimation(
+                    TranslateAnimation.ABSOLUTE, 0f,
+                    TranslateAnimation.ABSOLUTE, 0f,
+                    TranslateAnimation.RELATIVE_TO_PARENT, 1f,
+                    TranslateAnimation.RELATIVE_TO_PARENT, 0f);
+
+            mAnimation.setDuration(300);
+            mAnimation.setRepeatCount(0);
+            mAnimation.setRepeatMode(Animation.REVERSE);
+            mAnimation.setInterpolator(new LinearInterpolator());
+            thrown_cards[tSeat].setAnimation(mAnimation);
+        }
+
+        if (tSeat == 1) {
+            TranslateAnimation mAnimation = new TranslateAnimation(
+                    TranslateAnimation.RELATIVE_TO_PARENT, 1f,
+                    TranslateAnimation.RELATIVE_TO_PARENT, 0f,
+                    TranslateAnimation.ABSOLUTE, 0f,
+                    TranslateAnimation.ABSOLUTE, 0f);
+
+            mAnimation.setDuration(300);
+            mAnimation.setRepeatCount(0);
+            mAnimation.setRepeatMode(Animation.REVERSE);
+            mAnimation.setInterpolator(new LinearInterpolator());
+            thrown_cards[tSeat].setAnimation(mAnimation);
+        }
+
+        if (tSeat == 2) {
+            TranslateAnimation mAnimation = new TranslateAnimation(
+                    TranslateAnimation.ABSOLUTE, 0f,
+                    TranslateAnimation.ABSOLUTE, 0f,
+                    TranslateAnimation.RELATIVE_TO_PARENT, -1f,
+                    TranslateAnimation.RELATIVE_TO_PARENT, 0f);
+
+            mAnimation.setDuration(300);
+            mAnimation.setRepeatCount(0);
+            mAnimation.setRepeatMode(Animation.REVERSE);
+            mAnimation.setInterpolator(new LinearInterpolator());
+            thrown_cards[tSeat].setAnimation(mAnimation);
+        }
+
+        if (tSeat == 3) {
+            TranslateAnimation mAnimation = new TranslateAnimation(
+                    TranslateAnimation.ABSOLUTE, -100f,
+                    TranslateAnimation.ABSOLUTE, 0f,
+                    TranslateAnimation.ABSOLUTE, 0f,
+                    TranslateAnimation.ABSOLUTE, 0f);
+
+            mAnimation.setDuration(300);
+            mAnimation.setRepeatCount(0);
+            mAnimation.setRepeatMode(Animation.REVERSE);
+            mAnimation.setInterpolator(new LinearInterpolator());
+            thrown_cards[tSeat].setAnimation(mAnimation);
+        }
+
+
     }
 
     private void initializeViews() {
@@ -1871,20 +1949,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 //                Arrays.sort(tempCards);
 
                 for (int i = 0; i <= 12; i++) {
-                    for (int j = 0; j < 12 - i; j++) {
-                        if (tempCards[j].getCardNo() < tempCards[j + 1].getCardNo()) {
-                            Card tmp = tempCards[j];
-                            tempCards[j] = tempCards[j + 1];
-                            tempCards[j + 1] = tmp;
-                        }
-                    }
-                }
-                for (int i = 0; i <= 12; i++) {
-                    if (tempCards[i].getRank() != 0) {
-                        t_iv_cards[i].setImageResource(tempCards[i].getRes());
-                    } else {
-                        t_iv_cards[i].setVisibility(View.INVISIBLE);
-                    }
+                    t_iv_cards[i].setVisibility(View.INVISIBLE);
                 }
                 break;
             case R.id.btn_u2:
@@ -1892,15 +1957,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 deck = new Deck(gameData.getDeck());
                 tempCards = deck.getCards(((t_user - 1) * 13), t_user * 13 - 1);
 //                Arrays.sort(tempCards);
-                for (int i = 0; i <= 12; i++) {
-                    for (int j = 0; j < 12 - i; j++) {
-                        if (tempCards[j].getCardNo() < tempCards[j + 1].getCardNo()) {
-                            Card tmp = tempCards[j];
-                            tempCards[j] = tempCards[j + 1];
-                            tempCards[j + 1] = tmp;
-                        }
-                    }
-                }
                 for (int i = 0; i <= 12; i++) {
                     t_iv_cards[i].setImageResource(tempCards[i].getRes());
                 }
@@ -1911,15 +1967,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 tempCards = deck.getCards(((t_user - 1) * 13), t_user * 13 - 1);
 //                Arrays.sort(tempCards);
                 for (int i = 0; i <= 12; i++) {
-                    for (int j = 0; j < 12 - i; j++) {
-                        if (tempCards[j].getCardNo() < tempCards[j + 1].getCardNo()) {
-                            Card tmp = tempCards[j];
-                            tempCards[j] = tempCards[j + 1];
-                            tempCards[j + 1] = tmp;
-                        }
-                    }
-                }
-                for (int i = 0; i <= 12; i++) {
                     t_iv_cards[i].setImageResource(tempCards[i].getRes());
                 }
                 break;
@@ -1929,16 +1976,42 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 tempCards = deck.getCards(((t_user - 1) * 13), t_user * 13 - 1);
 //                Arrays.sort(tempCards);
                 for (int i = 0; i <= 12; i++) {
-                    for (int j = 0; j < 12 - i; j++) {
-                        if (tempCards[j].getCardNo() < tempCards[j + 1].getCardNo()) {
-                            Card tmp = tempCards[j];
-                            tempCards[j] = tempCards[j + 1];
-                            tempCards[j + 1] = tmp;
-                        }
-                    }
-                }
-                for (int i = 0; i <= 12; i++) {
                     t_iv_cards[i].setImageResource(tempCards[i].getRes());
+                }
+                break;
+
+            case R.id.btn_continue:
+                popupWindow.dismiss();
+
+                switch (mySeatNo) {
+                    case 1:
+                        reference2.child("chal_card_1").setValue(25);
+                        gameData.setChal_card_1(25);
+                        message.setText("Please Wait For all to get ready");
+                        break;
+                    case 2:
+                        reference2.child("chal_card_2").setValue(25);
+                        message.setText("Please Wait For all to get ready");
+                        break;
+                    case 3:
+                        reference2.child("chal_card_3").setValue(25);
+                        message.setText("Please Wait For all to get ready");
+                        break;
+                    case 4:
+                        reference2.child("chal_card_4").setValue(25);
+                        message.setText("Please Wait For all to get ready");
+                        break;
+                }
+
+                if(gameData.getChal_card_1() == 25 &&
+                        gameData.getChal_card_2() == 25 &&
+                        gameData.getChal_card_3() == 25 &&
+                        gameData.getChal_card_4() == 25 && mySeatNo == 1){
+                    gameData.setScoreA(0);
+                    gameData.setFeesA(0);
+                    gameData.setFeesB(0);
+                    gameData.setState(GameData.IDEAL);
+                    reference2.setValue(gameData);
                 }
                 break;
 
@@ -2020,6 +2093,52 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         for (int i = 0; i <= 12; i++) {
             t_iv_cards[i].setImageResource(tempCards[i].getRes());
         }
+    }
+
+    private void popupforCongratulate(Boolean isWinner) {
+
+        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        final View popupView = inflater.inflate(R.layout.popup_congratulations, null);
+
+        DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        final int width = dm.widthPixels;
+        final int height = dm.heightPixels;
+
+        boolean focusable = true;
+        popupWindow = new PopupWindow(popupView, (int) (width * 0.7), (int) (height * 0.6), focusable);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            popupWindow.setElevation(20);
+        }
+
+        findViewById(R.id.game_layout).post(new Runnable() {
+            @Override
+            public void run() {
+                popupWindow.showAtLocation(findViewById(R.id.game_layout), Gravity.CENTER, 0, 0);
+            }
+        });
+        popupWindow.setOutsideTouchable(false);
+        TextView message;
+
+        if(isWinner){
+            message = popupView.findViewById(R.id.text_congratulation);
+            message.setText("Congratulation");
+            message = popupView.findViewById(R.id.text_you_won);
+            message.setText("You won This game");
+
+        }else {
+            message = popupView.findViewById(R.id.text_congratulation);
+            message.setText("You Lost");
+            message = popupView.findViewById(R.id.text_you_won);
+            message.setText("Better Luck Next Time");
+        }
+
+
+        Button conti;
+        conti = popupView.findViewById(R.id.btn_continue);
+        conti.setOnClickListener(this);
+
     }
 
     private void updateDeckString(int position) {

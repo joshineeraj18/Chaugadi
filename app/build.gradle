@@ -9,8 +9,8 @@ android {
         applicationId "com.bhairaviwellbeing.chaugadi"
         minSdkVersion 16
         targetSdkVersion 30
-        versionCode 6
-        versionName "1.5"
+        versionCode 8
+        versionName "1.7"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
