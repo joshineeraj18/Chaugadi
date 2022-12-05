@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="#62def8"
     android:orientation="vertical"
-    android:weightSum="5">
+    android:weightSum="7">
 
     <TextView
         android:id="@+id/text_congratulation"
@@ -67,5 +67,13 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <pl.droidsonroids.gif.GifImageView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:id="@+id/crackers"
+        android:layout_weight="2"
+        android:src="@drawable/crack"
+        android:visibility="gone"/>
 
 </LinearLayout>

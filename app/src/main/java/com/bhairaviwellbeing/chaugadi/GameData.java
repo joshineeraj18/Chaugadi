@@ -345,7 +345,7 @@ public class GameData {
 
     }
 
-    public Card getLastThrownCard() {
+    public Card getLastThrownCard(int a) {
 
         switch (this.state) {
             case CHAL_1:

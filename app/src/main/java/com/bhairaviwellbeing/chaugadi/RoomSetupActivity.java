@@ -3,10 +3,14 @@ package com.bhairaviwellbeing.chaugadi;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
@@ -157,6 +161,12 @@ public class RoomSetupActivity extends AppCompatActivity implements View.OnClick
         add_pc.setOnClickListener(this);
 
         doorsounds = new ArrayList<MediaPlayer>();
+        if(ContextCompat.checkSelfPermission(RoomSetupActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(RoomSetupActivity.this,Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(RoomSetupActivity.this,
+                    new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_PHONE_STATE},1);
+        }
 
     }
 

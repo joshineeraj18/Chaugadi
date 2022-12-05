@@ -2,10 +2,15 @@ package com.bhairaviwellbeing.chaugadi;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
@@ -33,11 +38,22 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.sinch.android.rtc.PushPair;
+import com.sinch.android.rtc.Sinch;
+import com.sinch.android.rtc.SinchClient;
+import com.sinch.android.rtc.SinchError;
+import com.sinch.android.rtc.calling.Call;
+import com.sinch.android.rtc.calling.CallClient;
+import com.sinch.android.rtc.calling.CallClientListener;
+import com.sinch.android.rtc.calling.CallListener;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import pl.droidsonroids.gif.GifDrawable;
+import pl.droidsonroids.gif.GifImageView;
 
 public class GameActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -45,10 +61,19 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     LinearLayout cardRow1, cardRow2;
     Button btn_Shuffle;
 
+    private Call call;
+
+
     FirebaseUser user;
     DatabaseReference reference;
     DatabaseReference reference2;
     DatabaseReference logReference;
+
+    private static final String APP_KEY = "7fed24b2-2875-4d89-9005-adcd1c0eaaed";
+    private static final String APP_SECRET = "NrFQX6jYFkWNv59LK+rJrw==";
+    private static final String ENVIRONMENT = "sandbox.sinch.com";
+
+    SinchClient sinchClient;
 
     ImageView im_deck_shuffle;
     public static String room_no;
@@ -66,6 +91,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     TextView message;
     PopupWindow popupWindow;
     PopupWindow popupWindow2;
+
+    GifImageView gifImageView;
 
     LinearLayout ll_color;
     ImageView img_color;
@@ -219,9 +246,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
             cardRow1 = findViewById(R.id.lay);
             cardRow2 = findViewById(R.id.lay2);
+
+
             initializeViews();
             btn_Shuffle.setVisibility(View.GONE);
             im_deck_shuffle.setVisibility(View.GONE);
+
+
 
             pc1 = new Computer();
 //            score_bar.setOnClickListener(this);
@@ -289,6 +320,23 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             reference2 = FirebaseDatabase.getInstance().getReference("Rooms").child(room_no);
             logReference = FirebaseDatabase.getInstance().getReference("Log");
 
+            sinchClient = Sinch.getSinchClientBuilder()
+                    .context(this)
+                    .userId(user.getUid())
+                    .applicationKey(APP_KEY)
+                    .applicationSecret(APP_SECRET)
+                    .environmentHost(ENVIRONMENT)
+                    .build();
+
+            sinchClient.setSupportCalling(true);
+            sinchClient.startListeningOnActiveConnection();
+            sinchClient.start();
+
+
+            call = sinchClient.getCallClient().callConference(room_no);
+            call.addCallListener(new SinchCallListener());
+            sinchClient.getAudioController().enableSpeaker();
+
 
             ve1 = new ValueEventListener() {
                 @Override
@@ -311,6 +359,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
                         case GameData.IDEAL:
 
+                            latch =true;
                             if (gameData.getChal_card_1() == 25 &&
                                     gameData.getChal_card_2() == 25 &&
                                     gameData.getChal_card_3() == 25 &&
@@ -1199,8 +1248,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                 if (gameData.getPlayerIDAtSeat(gameData.getChal_seat()).contains("COMPUTER") && mySeatNo == 1) {
                                     int cardPlayed = pc1.chalProcess(0, 0, 0, gameData.getChal_seat(), gameData.getClaim_color(), gameData.getDeck());
 
-                                    Log log = new Log(logno++, cardPlayed, 0, 0, 0, gameData.getChal_seat(), gameData.getClaim_color(), gameData.getDeck());
-                                    logReference.child(room_no).child(log.getName()).setValue(log);
+//                                    Log log = new Log(logno++, cardPlayed, 0, 0, 0, gameData.getChal_seat(), gameData.getClaim_color(), gameData.getDeck());
+//                                    logReference.child(room_no).child(log.getName()).setValue(log);
 
                                     updateDeckStringForPC(cardPlayed);
                                     gameData.setNextChalCard(cardPlayed);
@@ -1258,8 +1307,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                             gameData.getClaim_color(),
                                             gameData.getDeck());
 
-                                    Log log = new Log(logno++, cardPlayed, gameData.getChal_card_1(), 0, 0, gameData.getChal_seat(), gameData.getClaim_color(), gameData.getDeck());
-                                    logReference.child(room_no).child(log.getName()).setValue(log);
+  //                                  Log log = new Log(logno++, cardPlayed, gameData.getChal_card_1(), 0, 0, gameData.getChal_seat(), gameData.getClaim_color(), gameData.getDeck());
+  //                                  logReference.child(room_no).child(log.getName()).setValue(log);
 
                                     updateDeckStringForPC(cardPlayed);
                                     gameData.setNextChalCard(cardPlayed);
@@ -1318,8 +1367,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                             gameData.getClaim_color(),
                                             gameData.getDeck());
 
-                                    Log log = new Log(logno++, cardPlayed, gameData.getChal_card_2(), gameData.getChal_card_1(), 0, gameData.getChal_seat(), gameData.getClaim_color(), gameData.getDeck());
-                                    logReference.child(room_no).child(log.getName()).setValue(log);
+   //                                 Log log = new Log(logno++, cardPlayed, gameData.getChal_card_2(), gameData.getChal_card_1(), 0, gameData.getChal_seat(), gameData.getClaim_color(), gameData.getDeck());
+   //                                 logReference.child(room_no).child(log.getName()).setValue(log);
 
 
                                     updateDeckStringForPC(cardPlayed);
@@ -1384,7 +1433,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                             gameData.getChal_card_3(),
                                             gameData.getChal_card_2(),
                                             gameData.getChal_card_1(), gameData.getChal_seat(), gameData.getClaim_color(), gameData.getDeck());
-                                    logReference.child(room_no).child(log.getName()).setValue(log);
+
+                                    //logReference.child(room_no).child(log.getName()).setValue(log);
 
 
                                     updateDeckStringForPC(cardPlayed);
@@ -1405,31 +1455,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                             }
                             break;
                         case GameData.CHAL_RESULT:
-
-                            if(gameData.getScoreA() > 51 || gameData.getScoreA() < -51){
-                                if(mySeatNo == 1){
-                                    if(gameData.getId2().contains("COMPUTER")){
-                                        gameData.setChal_card_2(25);
-                                    }else {
-                                        gameData.setChal_card_2(0);
-                                    }
-                                    if(gameData.getId3().contains("COMPUTER")){
-                                        gameData.setChal_card_3(25);
-                                    }else {
-                                        gameData.setChal_card_3(0);
-                                    }
-                                    if(gameData.getId4().contains("COMPUTER")){
-                                        gameData.setChal_card_4(25);
-                                    }else {
-                                        gameData.setChal_card_4(0);
-                                    }
-                                }
-                                gameData.setState(GameData.GAME_POINT);
-                                latch = true;
-                                reference2.setValue(gameData);
-                            }else {
                                 cardsound.start();
                                 updateThrownCards();
+                                latch = true;
+
                                 for (int i = 0; i <= 12; i++) {
                                     cardsIV[i].setClickable(false);
                                 }
@@ -1441,6 +1470,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                     } else {
                                         gameData.calculate_chal_result();
 
+                                        //Calculating Game Result
                                         if (gameData.getClaim_seat() == 1 || gameData.getClaim_seat() == 3) {
 
                                             if (gameData.getClaim_number() > gameData.getFeesA()) {
@@ -1456,9 +1486,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                                 gameData.setScoreA(gameData.getScoreA() - gameData.getFeesB());
                                             }
                                         }
-
                                         //Setting Up the Shuffling Seat as per Score
-
                                         if (gameData.getShufflingSeat() == 1 || gameData.getShufflingSeat() == 3) {
                                             if (gameData.getScoreA() > 0) {
                                                 gameData.setShufflingSeat(gameData.getnextSeat(gameData.getShufflingSeat()));
@@ -1468,8 +1496,28 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                                 gameData.setShufflingSeat(gameData.getnextSeat(gameData.getShufflingSeat()));
                                             }
                                         }
+                                            gameData.setState(GameData.SHUFFLING);
 
-                                            gameData.setState(GameData.CHAL_RESULT);
+                                        if(gameData.getScoreA() > 51 || gameData.getScoreA() < -51){
+
+                                                if(gameData.getId2().contains("COMPUTER")){
+                                                    gameData.setChal_card_2(25);
+                                                }else {
+                                                    gameData.setChal_card_2(0);
+                                                }
+                                                if(gameData.getId3().contains("COMPUTER")){
+                                                    gameData.setChal_card_3(25);
+                                                }else {
+                                                    gameData.setChal_card_3(0);
+                                                }
+                                                if(gameData.getId4().contains("COMPUTER")){
+                                                    gameData.setChal_card_4(25);
+                                                }else {
+                                                    gameData.setChal_card_4(0);
+                                                }
+                                                gameData.setShufflingSeat(gameData.getnextSeat(gameData.getnextSeat(gameData.getShufflingSeat())));
+                                                gameData.setState(GameData.GAME_POINT);
+                                        }
 
                                     }
 
@@ -1515,8 +1563,28 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                                 gameData.setShufflingSeat(gameData.getnextSeat(gameData.getShufflingSeat()));
                                             }
                                         }
-
                                         gameData.setState(GameData.SHUFFLING);
+
+                                        if(gameData.getScoreA() > 51 || gameData.getScoreA() < -51){
+
+                                            if(gameData.getId2().contains("COMPUTER")){
+                                                gameData.setChal_card_2(25);
+                                            }else {
+                                                gameData.setChal_card_2(0);
+                                            }
+                                            if(gameData.getId3().contains("COMPUTER")){
+                                                gameData.setChal_card_3(25);
+                                            }else {
+                                                gameData.setChal_card_3(0);
+                                            }
+                                            if(gameData.getId4().contains("COMPUTER")){
+                                                gameData.setChal_card_4(25);
+                                            }else {
+                                                gameData.setChal_card_4(0);
+                                            }
+                                            gameData.setShufflingSeat(gameData.getnextSeat(gameData.getnextSeat(gameData.getShufflingSeat())));
+                                            gameData.setState(GameData.GAME_POINT);
+                                        }
 
 
                                     }
@@ -1530,7 +1598,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                         }
                                     }, 3000);
                                 }
-                            }
+
 
                             break;
 
@@ -1539,19 +1607,35 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                             break;
 
                         case GameData.GAME_POINT:
+
+                            if(gameData.getChal_card_1() == 25 &&
+                                    gameData.getChal_card_2() == 25 &&
+                                    gameData.getChal_card_3() == 25 &&
+                                    gameData.getChal_card_4() == 25 && mySeatNo == 1){
+                                gameData.setScoreA(0);
+                                gameData.setFeesA(0);
+                                gameData.setFeesB(0);
+                                gameData.setState(GameData.IDEAL);
+                                reference2.setValue(gameData);
+                            }
+
                             if (latch) {
                                 latch = false;
                                 if(gameData.getScoreA()< -51){
                                     if(mySeatNo == 1 || mySeatNo == 3){
                                         popupforCongratulate(false);
+                                      //  gifImageView.setVisibility(View.VISIBLE);
                                     }else {
                                         popupforCongratulate(true);
+                                      //  gifImageView.setVisibility(View.VISIBLE);
                                     }
                                 }else {
                                     if(mySeatNo == 1 || mySeatNo == 3){
                                         popupforCongratulate(true);
+                                    //    gifImageView.setVisibility(View.VISIBLE);
                                     }else {
                                         popupforCongratulate(false);
+                                     //   gifImageView.setVisibility(View.VISIBLE);
                                     }
 
                                 }
@@ -1603,7 +1687,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         if (tSeat < 0) {
             tSeat = 4 + tSeat;
         }
-        thrown_cards[tSeat].setImageResource(gameData.getLastThrownCard().getRes());
+        thrown_cards[tSeat].setImageResource(gameData.getLastThrownCard(0).getRes());
         thrown_cards[tSeat].setVisibility(View.VISIBLE);
 
         if (tSeat == 0) {
@@ -2003,20 +2087,18 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                         break;
                 }
 
-                if(gameData.getChal_card_1() == 25 &&
-                        gameData.getChal_card_2() == 25 &&
-                        gameData.getChal_card_3() == 25 &&
-                        gameData.getChal_card_4() == 25 && mySeatNo == 1){
-                    gameData.setScoreA(0);
-                    gameData.setFeesA(0);
-                    gameData.setFeesB(0);
-                    gameData.setState(GameData.IDEAL);
-                    reference2.setValue(gameData);
-                }
+
                 break;
 
 
         }
+    }
+
+    @Override
+    protected void onPause() {
+        call.hangup();
+        sinchClient.getAudioController().disableSpeaker();
+        super.onPause();
     }
 
     private void popupforAllcards() {
@@ -2126,6 +2208,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             message.setText("Congratulation");
             message = popupView.findViewById(R.id.text_you_won);
             message.setText("You won This game");
+            gifImageView = popupView.findViewById(R.id.crackers);
+            gifImageView.setVisibility(View.VISIBLE);
 
         }else {
             message = popupView.findViewById(R.id.text_congratulation);
@@ -2147,5 +2231,45 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     private void updateDeckStringForPC(int playedCard) {
         gameData.setThrowncardindeck(playedCard);
+    }
+
+    private class SinchCallClientListener implements CallClientListener {
+
+        @Override
+        public void onIncomingCall(CallClient callClient, Call incomingcall) {
+
+            call = incomingcall;
+            Toast.makeText(GameActivity.this,"Incoming Call",Toast.LENGTH_SHORT).show();
+            call.answer();
+            sinchClient.getAudioController().enableSpeaker();
+            call.addCallListener(new SinchCallListener());
+        }
+
+    }
+
+    private class SinchCallListener implements CallListener {
+        @Override
+        public void onCallProgressing(Call call) {
+
+        }
+
+        @Override
+        public void onCallEstablished(Call call) {
+            Toast.makeText(GameActivity.this,"Call Established",Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onCallEnded(Call endedcall) {
+            call = null;
+            SinchError a = endedcall.getDetails().getError();
+            sinchClient.getAudioController().disableSpeaker();
+            setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
+            Toast.makeText(GameActivity.this,"Call Ended",Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onShouldSendPushNotification(Call call, List<PushPair> list) {
+
+        }
     }
 }

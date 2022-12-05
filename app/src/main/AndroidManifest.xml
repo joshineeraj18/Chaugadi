@@ -2,6 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.bhairaviwellbeing.chaugadi">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <uses-feature
+        android:name="android.hardware.microphone"
+        android:required="false" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/appsoe"
@@ -9,6 +19,8 @@
         android:roundIcon="@drawable/appiconround"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+
 
         <activity android:name="com.bhairaviwellbeing.chaugadi.RoomSetupActivity"></activity>
         <activity android:name="com.bhairaviwellbeing.chaugadi.TestActivity" />
